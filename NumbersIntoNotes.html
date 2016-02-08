@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Numbers Into Notes</title>
+<meta name="description" content="Javascript interactive demo for the Ada Lovelace Symposium, in which number 
+sequences are converted into notes.  December 2015, this version released February 2016.">
+<meta name="keywords" content="ada, lovelace, babbage, analytical engine, fibonacci, integer sequences">
+<meta name="author" content="David De Roure">
+<meta charset="UTF-8">
+<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+<!--
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css" />
+-->
+<link rel="stylesheet" href="css/NumbersIntoNotes.css" type="text/css" />
+</head>
+<!--
+To call CGI scripts on different hosts, edit the two action lines; e.g.
+            action="http://demeter.oerc.ox.ac.uk/cgi-bin/lily"
+            action="http://demeter.oerc.ox.ac.uk/cgi-bin/csvmidi"
+            action="http://localhost/~dave/lily.cgi"
+            action="http://localhost/~dave/csvmidi.cgi"
+-->
+<body onload="initPage()">
+<div class="container">
+ <div class="jumbotron" id="jumbo">
+
+<table align="right"><tr>
+<td><img src="logos/Oxford100.gif" style="padding: 5px;"/></td>
+<td><img src="logos/OeRC100.png" /></td>
+</tr></table>
+
+<h1>Numbers Into Notes</h1>
+<p class="lead">
+&ldquo;Supposing, for instance, that the fundamental relations of pitched 
+sounds in the science of harmony and of musical composition were susceptible
+of such expression and adaptations, the engine might compose elaborate
+and scientific pieces of music of any degree of complexity or extent.&rdquo;
+&nbsp;&nbsp;<small>Ada Lovelace, 1843</small>
+</p>
+<a href="#about"><button class="btn btn-info" data-toggle="tooltip" data-placement="top" title="Jump to About section">About</button></a>
+ </div>
+</div>
+
+<div class="container">
+ <div class="page-header">
+
+ <h2>1. Generate</h2>
+<p>
+The first stage in this interactive demonstration is to <b>generate</b>
+a sequence of numbers using an algorithm that might have been run on
+the Analytical Engine.
+In stage 2 you <b>reduce</b> these numbers to a smaller range
+of numbers, using 'clock arithmetic'. Then
+in stage 3, you can visualize and <b>play</b> the number sequence 
+interactively, and explore the mapping of the numbers to musical notes. 
+If this is your first visit, try the green buttons.
+NB This program has been developed and tested in Chrome and Firefox
+browsers.</p>
+
+ </div>
+</div>
+
+<div class="container">
+ <div class="row">
+  <div class="col-md-6">
+
+   <div class="panel panel-primary">
+    <div class="panel-heading">Fibonacci</div>
+    <div class="panel-body">
+
+<p>Each number is the sum of the previous two. If we start with 0, 1 we 
+get the sequence commonly known as the Fibonacci numbers 
+0, 1, 1, 2, 3, 5, 8, 13, ... (could also start 1, 1). If we start with 2, 1 
+we get the Lucas numbers 2, 1, 3, 4, 7, 11, 18, ... (could also start 1, 3).  
+The sequences are described mathematically by the relation 
+F<sub>k,n+1</sub> = kF<sub>k,n</sub> + F<sub>k,n-1</sub> where k = 1. 
+</p>
+
+<p>
+<button class="btn btn-success" onclick="doFibonacci()" data-toggle="tooltip" data-placement="top" title="Generate sequence of Fibonacci numbers">Fibonacci</button>
+   <em>n0:</em> <input type="number" id="n0" value="0" min="0" max="999">
+   <em>n1:</em> <input type="number" id="n1" value="1" min="0" max="999">
+   <em>k:</em>  <input type="number" id="k" value="1" min="1" max="99"></p>
+
+    </div>
+   </div>
+  </div>
+  <div class="col-md-3">
+
+   <div class="panel panel-primary">
+    <div class="panel-heading">Powers</div>
+    <div class="panel-body">
+
+<p>The sequence of powers of 2 is 2<sup>0</sup>, 2<sup>1</sup>,
+2<sup>2</sup>, 2<sup>3</sup>, ... i.e. 1, 2, 4, 8, 16, 32 etc.  Here
+you can generate the sequence of powers of 2 or any other number,
+known as the <em>base</em>.</p>
+
+<p>
+<button class="btn btn-success" onclick="doPowers()" data-toggle="tooltip" data-placement="top" title="Generate sequence of powers">Powers</button>
+<em>&nbsp;&nbsp;base:</em> <input type="number" id="base" value="2" min="2" max="99">
+</p>
+    </div>
+   </div>
+  </div>
+
+  <div class="col-md-3">
+
+   <div class="panel panel-primary">
+    <div class="panel-heading">Other Algorithms</div>
+    <div class="panel-body">
+
+<p>How might Ada Lovelace have calculated these?</p>
+<button class="btn btn-default" onclick="doPrimes()" data-toggle="tooltip" data-placement="top" title="Generate sequence of prime numbers">Primes</button>
+<button class="btn btn-default" onclick="doPi(100)" data-toggle="tooltip" data-placement="top" title="Generate sequence of digits of pi">Pi</button> 
+<button class="btn btn-default" onclick="doPhi(320)" data-toggle="tooltip" data-placement="top" title="Generate sequence of digits of the golden ratio">Golden Ratio</button> 
+
+<!-- A000796 
+<button class="btn btn-default" onclick="setSeq([3,1,4,1,5,9,2,6,5,3,5,8,9,7,9,3,2,3,8,4,6,2,6,4,3,3,8,3,2,7,9,5,0,2,8,8,4,1,9,7,1,6,9,3,9,9,3,7,5,1,0,5,8,2,0,9,7,4,9,4,4,5,9,2,3,0,7,8,1,6,4,0,6,2,8,6,2,0,8,9,9,8,6,2,8,0,3,4,8,2,5,3,4,2,1,1,7,0,6,7,9,8,2,1,4])">Pi</button> 
+-->
+<!-- A001622
+<button class="btn btn-default" onclick="setSeq([1,6,1,8,0,3,3,9,8,8,7,4,9,8,9,4,8,4,8,2,0,4,5,8,6,8,3,4,3,6,5,6,3,8,1,1,7,7,2,0,3,0,9,1,7,9,8,0,5,7,6,2,8,6,2,1,3,5,4,4,8,6,2,2,7,0,5,2,6,0,4,6,2,8,1,8,9,0,2,4,4,9,7,0,7,2,0,7,2,0,4,1,8,9,3,9,1,1,3,7,4,8,4,7,5])">Phi</button> 
+-->
+
+<p></p>
+<button class="btn btn-default" onclick="doRandom()" data-toggle="tooltip" data-placement="top" title="Generate sequence of random numbers less than the given number">Random</button>
+<input type="number" id="random" value="84" min="2" max="999">
+
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+
+<div id="algorithms" class="collapse">
+<div class="container">
+ <div class="row">
+  <div class="col-md-3">
+
+   <div class="panel panel-primary">
+    <div class="panel-heading">Arithmetic progression</div>
+    <div class="panel-body">
+
+<p>The sequence starting at <em>a</em> and adding <em>d</em> each 
+time, so 0 and 1 gives 0,1,2,3,4, ... Useful to illustrate
+mappings of numbers to notes.</p>
+
+<p>
+<button class="btn btn-default" onclick="doArithmetic()">Arithmetic Progression</button>
+</p><p>
+<em>a:</em> <input type="number" id="a" value="0" min="0" max="999">
+<em>d:</em> <input type="number" id="d" value="1" min="0" max="999">
+</p><p>
+
+    </div>
+   </div>
+  </div>
+  <div class="col-md-3">
+
+   <div class="panel panel-primary">
+    <div class="panel-heading">Triangular and Factorials</div>
+    <div class="panel-body">
+
+<p>Triangular numbers are the sequence of sums 1, 1 + 2, 1 + 2 + 3, 1 + 2 + 3 + 4, ....</p>
+
+<p>Factorial numbers are the sequence of products 1, 1 x 2, 1 x 2 x 3, 1 x 2 x 3 x 4, ...</p>
+
+<p></p>
+<button class="btn btn-default" onclick="doTriangle()">Triangular</button>
+<button class="btn btn-default" onclick="doFactorial()">Factorial</button>
+
+    </div>
+   </div>
+  </div>
+  <div class="col-md-3">
+
+   <div class="panel panel-primary">
+    <div class="panel-heading">Sinusoidal</div>
+    <div class="panel-body">
+
+<p>This is an approximation to a sine wave, the sequence described by the 
+equation <em>a + a.sin(r&theta;)</em>
+
+<p>
+<button class="btn btn-default" onclick="doSin()">Sine</button>
+<em>a:</em> <input type="number" id="amplitude" value="12" min="1" max="63">
+<em>r:</em> <input type="number" id="r" value="5" min="1" max="999"></p>
+
+    </div>
+   </div>
+  </div>
+  <div class="col-md-3">
+
+   <div class="panel panel-primary">
+    <div class="panel-heading">Bernoulli</div>
+    <div class="panel-body">
+
+<p>Bernouill numbers are generated here using the algorithm described
+by Ada Lovelace. The numbers are a sequence of fractions, so we provide
+a sequence of numerators or a sequence of denominators.</p>
+
+<p>
+<button class="btn btn-default" onclick="doBernoullinumerators()">Numerators</button> 
+<button class="btn btn-default" onclick="doBernoullidenominators()">Denominators</button> 
+</p>
+
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+</div>
+
+<div class="container">
+ <div class="row">
+  <div class="col-md-10">
+   <div class="panel panel-info">
+    <div class="panel-heading">
+     <h3 class="panel-title">The Sequence</h3>
+    </div>
+    <div class="panel-body" id="sequence">
+    </div>
+   </div>
+  </div>
+  <div class="col-md-2">
+   <button class="btn btn-info" data-toggle="collapse" data-target="#algorithms" data-toggle="tooltip" data-placement="top" title="Show or hide more algorithms" >More algorithms</button>
+   <p></p>
+   <button class="btn btn-info" onclick="displaySequence(0,0)" data-toggle="tooltip" data-placement="top" title="Show the sequence as far as possible">More numbers</button>
+   <p></p>
+   <button class="btn btn-default" onclick="doOEIS()" data-toggle="tooltip" data-placement="top" title="Search the Online Encyclopedia of Integer Sequence using the first 10 numbers">Search OEIS</button>
+   <p></p>
+   <p id="colourexplanation"></p>
+  </div>
+ </div>
+</div>
+
+<div class="container">
+ <div class="page-header">
+  <h2>2. Reduce</h2>
+ </div>
+</div>
+
+<div class="container">
+ <div class="row">
+  <div class="col-md-6">
+
+   <div class="panel panel-primary">
+    <div class="panel-heading">Modulo</div>
+    <div class="panel-body">
+
+<p>We reduce each of the numbers in the sequence using modular arithmetic
+(clock arithmetic).  We divide each number by <em>mod</em> and keep the 
+remainder, so all the numbers will be between 0 and <em>mod - 1</em>.
+</p>
+
+<p>
+<button class="btn btn-success" onclick="doModsequence()" data-toggle="tooltip" data-placement="top" title="Reduce the numbers to the given modulus">Reduce</button>
+<em>mod:</em> <input type="number" id="modulus" value="35" min="2" max="128"></p>
+
+    </div>
+   </div>
+  </div>
+
+  <div class="col-md-4">
+
+   <div class="panel panel-primary">
+    <div class="panel-heading">Logarithms</div>
+    <div class="panel-body">
+
+<p>Logarithms are included here to help visualize the growth of the sequences.
+Log<sub>10</sub> of 10 is 1, 100 is 2, 1000 is 3, etc
+(logs of zero or negative numbers will appear as 0).</p>
+
+<button class="btn btn-default" onclick="doLogsequence()" data-toggle="tooltip" data-placement="top" title="Take logs base 10">Generate logs</button>
+
+    </div>
+   </div>
+  </div>
+ </div>
+
+ <div class="row">
+   <br />
+ </div>
+
+ <div class="row">
+  <div class="col-md-10">
+   <div class="panel panel-info">
+    <div class="panel-heading">
+     <h3 class="panel-title">The Numbers</h3>
+    </div>
+    <div class="panel-body">
+    <textarea id="modsequence" rows="4" cols="120" placeholder="Number sequence"></textarea>
+    <br />
+    <button class="btn btn-default" onclick="updateModseq()" data-toggle="tooltip" data-placement="top" title="Register changes after manually editing sequence">Update</button>
+    </div>
+   </div>
+  </div>
+  <div class="col-md-2">
+   <div class="panel panel-info">
+    <div class="panel-heading">
+     <h3 class="panel-title">About</h3>
+    </div>
+    <div class="panel-body">
+    <table class="table-condensed">
+    <tr><td><strong>length</strong></td><td><span id="length"></span></td></tr>
+    <tr><td><strong>mod</strong></td><td><span id="mod"></span></td></tr>
+    <tr><td><strong>period</strong></td><td><span id="period"></span></td></tr>
+    </table>
+    <p></p>
+    <button class="btn btn-default" onclick="displayCorrelation(0)" data-toggle="tooltip" data-placement="top" title="Show autocorrelation table">AC</button>
+    <button class="btn btn-default" onclick="displayCorrelation(1)" data-toggle="tooltip" data-placement="top" title="Correlation in diatonic scale">7</button>
+    <button class="btn btn-default" onclick="displayCorrelation(2)" data-toggle="tooltip" data-placement="top" title="Correlation in chromatic scale">12</button>
+    </div>
+   </div>
+  </div>
+ </div>
+ <div class="row">
+  <div class="col-md-10">
+   <span id="correlationtable"></span>
+  </div>
+ </div>
+</div>
+
+<div class="container">
+ <div class="page-header">
+ <h2>3. Play</h2>
+ </div>
+</div>
+
+<div class="container">
+ <div class="row">
+  <div class="col-md-12">
+
+<p>Press <em>Display</em> to show a 'number roll' visualization of the 
+sequence, with time from left to right and numbers going up.
+The mapping of numbers to notes can be modified as you wish using the 
+buttons below the number roll.
+Press the <em>Play</em> button to play the sequence as eighth notes (quavers), 
+or the <em>4</em> or <em>2</em> buttons to play quarter or half notes, with
+<a onclick="setInstrument('acoustic_grand_piano')">piano</a> or
+<a onclick="setInstrument('xylophone')">xylophone</a> sounds.
+The mouse selects a subset of notes to be played, and holding the shift key 
+down modifies the current selection.
+<em>Sust</em> causes notes to be sustained so that you can hear them alongside 
+each other.  You can also change the tempo (beats per minute). 
+The <em>Life</em> button produces the next generation of the number roll according 
+to the rules of the Game of Life (devised 1970). Pressing <em>Display</em> resets
+the display at any time.
+</p>
+
+  </div>
+ </div>
+ <div class="row">
+  <div class="col-md-3">
+   <div class="btn-group" role="group">
+
+<button class="btn btn-success" onclick="initRoll()" data-toggle="tooltip" data-placement="top" title="Display piano roll">Display</button>
+<button class="btn btn-default" onclick="rollWidth(-1)" data-toggle="tooltip" data-placement="top" title="Make roll narrower">w-</button>
+<button class="btn btn-default" onclick="rollWidth(1)" data-toggle="tooltip" data-placement="top" title="Make roll wider">w+</button>
+<button class="btn btn-default" onclick="rollHeight(-1)" data-toggle="tooltip" data-placement="top" title="Make roll shorter">h-</button>
+<button class="btn btn-default" onclick="rollHeight(1)" data-toggle="tooltip" data-placement="top" title="Make roll taller">h+</button>
+
+   </div>
+  </div>
+  <div class="col-md-4">
+   <div class="btn-group" role="group">
+
+<button class="btn btn-success" onclick="playRoll(8)" data-toggle="tooltip" data-placement="top" title="Play eighth notes"><span class="glyphicon glyphicon-play"></span></button>
+<button class="btn btn-default" onclick="playRoll(4)" data-toggle="tooltip" data-placement="top" title="Play quarter notes">4</button>
+<button class="btn btn-default" onclick="playRoll(2)" data-toggle="tooltip" data-placement="top" title="Play half notes">2</button>
+<button class="btn btn-default" onclick="playRoll(1)" data-toggle="tooltip" data-placement="top" title="Play whole notes">1</button>
+<button class="btn btn-success" onclick="playStop()" data-toggle="tooltip" data-placement="top" title="Stop playback"><span class="glyphicon glyphicon-stop"></span></button>
+<button class="btn btn-default" onclick="extendNotes(1)" data-toggle="tooltip" data-placement="top" title="Set separate notes">Stacc</button>
+<button class="btn btn-default" onclick="extendNotes(2)" data-toggle="tooltip" data-placement="top" title="Set sustained notes">Sust</button>
+
+   </div>
+  </div>
+  <div class="col-md-2">
+   <div class="btn-group" role="group">
+
+<button class="btn btn-default" onclick="copySelection()" data-toggle="tooltip" data-placement="top" title="Copy selection"><span class="glyphicon glyphicon-copy"></span></button>
+<button class="btn btn-default" onclick="pasteSelection()" data-toggle="tooltip" data-placement="top" title="Paste selection at index chosen by arrow keys"><span class="glyphicon glyphicon-paste"></span></button>
+<button class="btn btn-default" onclick="nudgeSelection(-1)" data-toggle="tooltip" data-placement="top" title="Nudge paste location left"><span class="glyphicon glyphicon-arrow-left"></span></button>
+<button class="btn btn-default" onclick="nudgeSelection(1)" data-toggle="tooltip" data-placement="top" title="Nudge paste location right"><span class="glyphicon glyphicon-arrow-right"></span></button>
+
+   </div>
+  </div>
+  <div class="col-md-1">
+   <div class="input-group">
+    <input type="text" id="bpm" value="60" class="form-control">
+   </div>
+  </div>
+<button class="btn btn-default play" onclick="doLife()" data-toggle="tooltip" data-placement="top">Life</button>
+ </div>
+</div>
+
+<p></p>
+<div class="container">
+ <div class="row">
+  <div class="col-md-12">
+
+<canvas id="pianoroll" width="512" height="80"></canvas>
+
+  </div>
+ </div>
+ <div class="row">
+  <div class="col-md-2">
+   <div class="btn-group" role="group">
+
+<span id="notenumber" class="label label-default"></span>
+<span id="notename" class="label label-default"></span>
+<span id="noteindex" class="label label-default"></span>
+<span id="selected" class="label label-danger"></span>
+
+   </div>
+  </div>
+ </div>
+</div>
+
+<textarea id="selection" value="" cols="100" rows="1" style="display:none;"></textarea>
+
+<div class="container">
+ <div class="row">
+  <div class="col-md-12">
+
+<p>Choose which pitch and octave the number 0 corresponds to (e.g. C1), then 
+click on a scale.  Pressing any buttons will regenerate the mapping table.
+The mapping comes into effect next time you play.</p>
+
+  </div>
+ </div>
+ <div class="row">
+  <div class="col-md-6">
+   <div class="btn-group" role="group">
+
+<button class="btn btn-default" onclick="setPitch(0)">C</button>
+<button class="btn btn-default" onclick="setPitch(1)">C#</button>
+<button class="btn btn-default" onclick="setPitch(2)">D</button>
+<button class="btn btn-default" onclick="setPitch(3)">Eb</button>
+<button class="btn btn-default" onclick="setPitch(4)">E</button>
+<button class="btn btn-default" onclick="setPitch(5)">F</button>
+<button class="btn btn-default" onclick="setPitch(6)">F#</button>
+<button class="btn btn-default" onclick="setPitch(7)">G</button>
+<button class="btn btn-default" onclick="setPitch(8)">Ab</button>
+<button class="btn btn-default" onclick="setPitch(9)">A</button>
+<button class="btn btn-default" onclick="setPitch(10)">Bb</button>
+<button class="btn btn-default" onclick="setPitch(11)">B</button>
+
+   </div>
+   <div class="btn-group" role="group">
+
+<button class="btn btn-default" onclick="setOctave(0)">0</button>
+<button class="btn btn-default" onclick="setOctave(1)">1</button>
+<button class="btn btn-default" onclick="setOctave(2)">2</button>
+<button class="btn btn-default" onclick="setOctave(3)">3</button>
+<button class="btn btn-default" onclick="setOctave(4)">4</button>
+<button class="btn btn-default" onclick="setOctave(5)">5</button>
+<button class="btn btn-default" onclick="setOctave(6)">6</button>
+<button class="btn btn-default" onclick="setOctave(7)">7</button>
+
+   </div>
+   <div class="btn-group" role="group">
+
+<!-- Common Scales -->
+<button class="btn btn-default" onclick="setScale([2,2,1,2,2,2,1])">Major</button>
+<button class="btn btn-default" onclick="setScale([2,1,2,2,1,2,2])">Natural minor</button>
+<button class="btn btn-default" onclick="setScale([2,1,2,2,1,3,1])">Harmonic minor</button>
+<button class="btn btn-default" onclick="setScale([2,2,1,2,1,3,1])">Harmonic major</button>
+
+   </div>
+   <div class="btn-group" role="group">
+
+<button class="btn btn-default" onclick="setScale([2,2,3,2,3])">Pentatonic</button>
+<button class="btn btn-default" onclick="setScale([2])">Whole Tone</button>
+<button class="btn btn-default" onclick="setScale([1])">Chromatic</button>
+
+   </div>
+  </div>
+  <div class="col-md-1">
+   <div class="panel panel-info">
+    <div class="panel-heading">
+     <h3 class="panel-title">Pitch</h3>
+    </div>
+    <div class="panel-body" id="pitch">
+    </div>
+   </div>
+  </div>
+  <div class="col-md-1">
+   <div class="panel panel-info">
+    <div class="panel-heading">
+     <h3 class="panel-title">Oct</h3>
+    </div>
+    <div class="panel-body" id="octave">
+    </div>
+   </div>
+  </div>
+  <div class="col-md-4">
+   <div class="panel panel-info">
+    <div class="panel-heading">
+     <h3 class="panel-title">Generate Scale from Intervals</h3>
+    </div>
+    <div class="panel-body" id="generator">
+    <input type="text" id="scale" value="" />
+    <button class="btn btn-default" onclick="reGenerate()" data-toggle="tooltip" data-placement="top" title="Regenerate mapping of numbers to notes using intervals">Regenerate</button>
+    </div>
+   </div>
+  </div>
+ </div>
+
+<p></p>
+
+ <div class="row">
+  <div class="col-md-12">
+  <table class="table table-bordered" id="map"></table>
+  </div>
+ </div>
+ 
+ <div class="row">
+  <div class="col-md-12">
+   <button class="btn btn-info" data-toggle="collapse" data-target="#scales" data-toggle="tooltip" data-placement="top" title="Show more buttons with predefined scale intervals">More scales</button>
+  </div>
+ </div>
+</div>
+
+<div class="container">
+ <div id="scales" class="collapse">
+  <div class="row">
+   <div class="col-md-12">
+<p></p>
+<p>
+<button class="btn btn-default" onclick="setScale([1])">Chromatic</button>
+<button class="btn btn-default" onclick="setScale([2])">2</button>
+<button class="btn btn-default" onclick="setScale([3])">3</button>
+<button class="btn btn-default" onclick="setScale([2,1])">2-1</button>
+<button class="btn btn-default" onclick="setScale([1,2])">1-2</button>
+<button class="btn btn-default" onclick="setScale([4])">4</button>
+<button class="btn btn-default" onclick="setScale([3,1])">3-1</button>
+<button class="btn btn-default" onclick="setScale([1,3])">1-3</button>
+<button class="btn btn-default" onclick="setScale([5])">5</button>
+<button class="btn btn-default" onclick="setScale([1,4])">1-4</button>
+<button class="btn btn-default" onclick="setScale([4,1])">4-1</button>
+<button class="btn btn-default" onclick="setScale([2,3])">2-3</button>
+<button class="btn btn-default" onclick="setScale([3,2])">3-2</button>
+<button class="btn btn-default" onclick="setScale([6])">6</button>
+<button class="btn btn-default" onclick="setScale([1,5])">1-5</button>
+<button class="btn btn-default" onclick="setScale([5,1])">5-1</button>
+<button class="btn btn-default" onclick="setScale([2,4])">2-4</button>
+<button class="btn btn-default" onclick="setScale([4,2])">4-2</button>
+<button class="btn btn-default" onclick="setScale([5,7])">5-7</button>
+<button class="btn btn-default" onclick="setScale([7,5])">7-5</button>
+</p>
+<p>
+<button class="btn btn-default" onclick="setScale([2,2,1,2,2,2,1])">Major</button>
+<button class="btn btn-default" onclick="setScale([2,1,2,2,1,2,2])">Natural minor</button>
+<button class="btn btn-default" onclick="setScale([2,1,2,2,1,3,1])">Harmonic minor</button>
+<button class="btn btn-default" onclick="setScale([2,2,1,2,1,3,1])">Harmonic major</button>
+<button class="btn btn-default" onclick="setScale([2,2,1,2,2,2,1])">Ionian</button>
+<button class="btn btn-default" onclick="setScale([2,1,2,2,2,1,2])">Dorian</button>
+<button class="btn btn-default" onclick="setScale([1,2,2,2,1,2,2])">Phrygian</button>
+<button class="btn btn-default" onclick="setScale([2,2,2,1,2,2,1])">Lydian</button>
+<button class="btn btn-default" onclick="setScale([2,2,1,2,2,1,2])">Mixolydian</button>
+<button class="btn btn-default" onclick="setScale([2,1,2,2,1,2,2])">Aeolian</button>
+<button class="btn btn-default" onclick="setScale([1,2,2,1,2,2,2])">Locrian</button>
+</p>
+<p>
+<button class="btn btn-default" onclick="setScale([2,1,2,2,2,2,1])">Melodic ascending minor</button>
+<button class="btn btn-default" onclick="setScale([1,2,2,2,2,1,2])">Phrygian raised sixth</button>
+<button class="btn btn-default" onclick="setScale([2,2,2,2,1,2,1])">Lydian raised fifth</button>
+<button class="btn btn-default" onclick="setScale([2,2,2,1,2,1,2])">Acoustic</button>
+<button class="btn btn-default" onclick="setScale([2,2,1,2,1,2,2])">Major minor</button>
+<button class="btn btn-default" onclick="setScale([2,1,2,1,2,2,2])">Half diminished scale</button>
+<button class="btn btn-default" onclick="setScale([1,2,1,2,2,2,2])">Altered scale</button>
+</p>
+<p>
+<button class="btn btn-default" onclick="setScale([2,2,2,2,2,2])">Whole Tone</button>
+<button class="btn btn-default" onclick="setScale([3,1,3,1,3,1])">Augmented</button>
+<button class="btn btn-default" onclick="setScale([2,2,2,3,1,2])">Prometheus</button>
+<button class="btn btn-default" onclick="setScale([3,2,1,1,3,2])">Blues</button>
+<button class="btn btn-default" onclick="setScale([1,3,2,1,3,2])">Tritone</button>
+<button class="btn btn-default" onclick="setScale([2,2,3,2,3])">Major Pentatonic</button>
+<button class="btn btn-default" onclick="setScale([2,3,2,3,2])">Egyptian</button>
+<button class="btn btn-default" onclick="setScale([3,2,3,2,2])">Blues minor</button>
+<button class="btn btn-default" onclick="setScale([2,3,2,2,3])">Blues major</button>
+<button class="btn btn-default" onclick="setScale([3,2,2,3,2])">Minor Pentatonic</button>
+</p>
+
+   </div>
+  </div>
+ </div>
+</div>
+
+<div class="container">
+ <div class="page-header">
+ <h2>4. Export</h2>
+ </div>
+</div>
+
+<div class="container">
+ <div class="row">
+  <div class="col-md-12">
+
+<p>
+Here you can see the note sequence in various data formats, which you 
+can copy and paste to export this data to other software tools&mdash;Lilypond
+to display notes in music notation, MIDI CSV to generate Standard MIDI
+files, or an image of the number roll.
+If you are running this web page from a server that supports
+conversions automatically then you will see <em>Generate PDF</em>
+and <em>Generate MIDI</em> buttons, which open a new browser window.
+Metadata specified here (e.g. a title) is included in the exported files.
+</p>
+
+  </div>
+ </div>
+</div>
+
+<div class="container">
+ <ul class="nav nav-pills">
+    <li class="active"><a href="#notestab" data-toggle="tab" onclick="outputNoteNames()">Note Names</a></li>
+    <li><a href="#lilytab" data-toggle="tab" onclick="outputLilypond()">Notation</a></li>
+    <li><a href="#miditab" data-toggle="tab" onclick="outputMidiCsv()">MIDI</a></li>
+    <li><a href="#imagetab" data-toggle="tab" onclick="outputImage()">Image</a></li>
+    <li><a href="#metadatatab" data-toggle="tab">Metadata</a></li>
+ </ul>
+ <p></p>
+ <div class="tab-content">
+  <div class="tab-pane" id="metadatatab">
+   <div>
+    <div class="panel panel-info">
+     <div class="panel-heading">
+      <h3 class="panel-title">Metadata</h3>
+     </div>
+     <div class="panel-body">
+ 
+ <form>
+  <div class="form-group">
+   <label for="metaTitle">Title</label>
+   <input type="text" class="form-control" id="metaTitle" placeholder="Title of this piece">
+  </div>
+  <div class="form-group">
+   <label for="metaDescription">Description</label>
+   <textarea class="form-control" rows="3" id="metaDescription" placeholder="Description of your piece"></textarea>
+  </div>
+  <div class="form-group">
+   <label for="metaCreator">Creator</label>
+   <input type="text" class="form-control" id="metaCreator" placeholder="Your name or something to identify you as the creator of this piece">
+  </div>
+  <div class="form-group">
+   <label for="metaParameters">Parameters</label>
+   <table class="table table-bordered" id="metaParameters"><tr>
+    <td>Sequence</td>
+    <td>Rows</td>
+    <td>Columns</td>
+    <td>Pitch</td>
+    <td>Octave</td>
+    <td>Intervals</td>
+    <td>Selection</td>
+    <td>BPM</td>
+    </tr><tr>
+    <td><span id="metaSequence"></span></td>
+    <td><span id="metaRows"></span></td>
+    <td><span id="metaColumns"></span></td>
+    <td><span id="metaPitch"></span></td>
+    <td><span id="metaOctave"></span></td>
+    <td><span id="metaScale"></span></td>
+    <td><span id="metaSelection"></span></td>
+    <td><span id="metaTempo"></span></td>
+    </tr>
+   </table>
+  </div>
+  <div class="form-group">
+   <label for="metaDate">Date</label>
+   <input type="text" class="form-control" id="metaDate" placeholder="Automatically generated date">
+  </div>
+  <div class="form-group">
+   <label for="metaIdentifier">Identifier</label>
+   <input type="text" class="form-control" id="metaIdentifier" placeholder="Automatically generated identifier">
+  </div>
+ </form>
+ 
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <div class="tab-pane" id="lilytab">
+   <div>
+    <div class="panel panel-info">
+     <div class="panel-heading">
+      <h3 class="panel-title">Lilypond music score notation</h3>
+     </div>
+     <div class="panel-body">
+      <form role="form" id="lilyform" method="POST"
+	    action="http://demeter.oerc.ox.ac.uk/cgi-bin/lily"
+            target="_blank">
+       <div class="form-group">
+        <textarea id="lilytext" name="lilytext" rows="6" cols="120" placeholder="Text for copying " readonly></textarea>
+       </div>
+       <button class="btn btn-info" type="submit" id="lilysubmit" value="Submit" display="none">Generate PDF</button>
+      </form>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="tab-pane" id="miditab">
+   <div>
+    <div class="panel panel-info">
+     <div class="panel-heading">
+      <h3 class="panel-title">MIDI piano roll (CSV)</h3>
+     </div>
+     <div class="panel-body">
+      <form role="form" id="midiform" method="POST"
+	    action="http://demeter.oerc.ox.ac.uk/cgi-bin/csvmidi"
+            target="_blank">
+       <div class="form-group">
+        <textarea id="miditext" name="miditext" rows="6" cols="120" placeholder="Text for copying " readonly></textarea>
+       </div>
+       <button class="btn btn-info" type="submit" id="midisubmit" value="Submit" display="none">Generate MIDI</button>
+      </form>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="tab-pane active" id="notestab">
+   <div>
+    <div class="panel panel-info">
+     <div class="panel-heading">
+      <h3 class="panel-title">Notes</h3>
+     </div>
+     <div class="panel-body">
+      <textarea id="notestext" rows="6" cols="120" placeholder="Text for copying " readonly></textarea>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="tab-pane" id="imagetab">
+   <div>
+    <div class="panel panel-info">
+     <div class="panel-heading">
+      <h3 class="panel-title">Image of Number Roll</h3>
+     </div>
+     <div class="panel-body">
+      <div id="rollimage"></div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+
+<div class="container">
+ <div class="page-header" id="about">
+ <h2>About</h2>
+ </div>
+</div>
+
+<div class="container">
+ <div class="row">
+  <div class="col-md-12">
+
+<div class="alert alert-info" role="alert">
+<p class="lead">
+This tool was developed to generate Fibonacci numbers and reduce them with
+clock arithmetic, generating a periodic sequence which is then
+mapped to notes, and the music explored by selecting fragments to play
+(Lagrange noted periodic functions in Fibonacci numbers in 1774, and
+the period is known as the <em>Pisano period</em>).
+Additional algorithms have been added to stimulate discussion of 
+mathematical calculations on the Analytical Engine, contemplating what 
+Ada Lovelace and Charles Babbage might have done if the engine had been
+built. <em>Powers</em> is included as it is the example in the 
+<em>Ada sketches</em> operatic work composed by Emily Howard. 
+The other examples are:
+<p></p>
+<dl class="dl-horizontal lead">
+<dt>Pi</dt><dd>Pi was calculated by hand to 100 decimal places in 1706 using
+Machin's algorithm.  The same algorithm is used here&mdash;note that algorithms 
+existed before computers. Pi is believed to be a 'normal number'
+which means any possible musical sequence appears somewhere in its digits.</dd>
+<dt>Golden Ratio</dt><dd>This is the number that the ratio of successive 
+Fibonacci numbers converges to (1.618...) and it's calculated using a square 
+root function. Although the square root algorithm we use is known today as 
+Newton's method, it goes back to 1st century Greece or Babylonian times
+(incidentally the Babylonians worked in sexagesimal i.e. base 60).</dd>
+<dt>Prime numbers</dt><dd>Calculated here using the <em>Sieve of Eratosthenes</em>,
+but how might this have been coded for the Analytical Engine?
+The size of the sieve is estimated using a 1798 result by Legendre.</dd>
+<dt>Random</dt><dd>How could random numbers have been generated on
+the Analytical Engine?</dd>
+<dt>Factorials</dt><dd>We see triangle numbers created by adding, and
+Factorials by multiplying, hence that the factorial sequence goes up much 
+more rapidly. The notation
+for factorial, e.g. 20!, was introduced in 1808. 20! can be stored in
+a 64 bit integer before we run out of bits, but the analytical engine could 
+go up to 41! with its support for 50 decimal digits.</dd>
+<dt>Sine</dt><dd>The sin trig function is used here to generate an integer 
+sequence approximating a sinusoidal wave.
+The Analytical Engine could have been used for creating trignometric tables. 
+This also illustrates another way of generating sounds, by generating a 
+waveform (but how might that have been converted to sound?)
+<dt>Bernoulli</dt><dd>Ada Lovelace is famed for the algorithm to generate Bernoulli numbers.
+Here we generate the numerator and denominator sequences separately.
+Only short sequences are generated because it is quite computationally
+intensive, using a rational arithmetic library. How long would the
+algorithm have taken to run on the Analytical Engine?  </dd>
+</dl>
+</div>
+
+<p><strong>
+Please email <a href="mailto:numbersintonotes@gmail.com">Numbers into Notes</a> with 
+any questions, bug reports, and suggestions for new features.
+This application is currently only supported on Chrome and Firefox.
+</strong></p>
+
+<p>
+Written by David De Roure, December 2015, for the <em>Ada Lovelace 
+Symposium</em> and as an interative demonstration to encourage discussion
+about music, mathematics, and programming at the time of Ada Lovelace.
+Thanks to Emily Howard and Lasse Rempe-Gillen for their inspiration
+through <em>Ada sketches</em>, to Pip Willcox for jointly organising 
+the <em>Numbers into Notes</em> project, and to all our colleagues for 
+feedback and ideas.
+This research is supported by the <em>Transforming Musicology</em> project
+funded by the Arts and Humanities Research Council, and the <em>FAST</em>
+project funded by the Engineering and Physical Sciences Research Council.
+</p>
+<p>
+<small>
+When this application is run online, the logs maintained by the server include 
+the IP address of the client, the referring web page, and the user agent (browser). 
+This information is used for debugging and developing the software, and may be 
+summarised in aggregate form to report usage in publicly available documents.
+We do not use cookies.  When export format conversion functionality is enabled, 
+exported Lilypond and MIDI files are stored on the server on a temporary basis
+and are available to anyone with the appropriate URLs: they are stored for access, 
+to assist with debugging and demonstrating the operation of the program, and 
+in order to analyse and report on usage.
+</small>
+</p>
+  </div>
+ </div>
+</div>
+
+<div class="container">
+ <div class="row">
+  <div class="col-md-9">
+<a href="http://www.transforming-musicology.org/"><img src="logos/transforming_musicology.png" width="100%" /></a>
+
+  </div>
+  <div class="col-md-3">
+
+<a href="http://www.semanticaudio.ac.uk/"><img src="logos/FAST-500px.png" width="100%" /></a>
+
+  </div>
+ </div>
+</div>
+
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script src="js/bootstrap.min.js" type="text/javascript"></script>
+<script src="js/big.js" type="text/javascript"></script>
+<script src="js/Ratio-0.4.1.min.js" type="text/javascript"></script>
+<script src="js/ada-bernoulli.js" type="text/javascript"></script>
+<script src="js/AudioContextMonkeyPatch.js" type="text/javascript"></script>
+<script src="js/soundfont-player.min.js" type="text/javascript"></script>
+<script src="js/NumbersIntoNotes.js" type="text/javascript"></script>
+
+</body>
+</html>

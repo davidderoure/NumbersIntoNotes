@@ -1,0 +1,138 @@
+#!/bin/bash
+
+# Script to receive a Lilypond file from a POST request and convert it
+# to a PDF which is stored for (temporary) web access and returned in
+# response.
+#
+# For now the source file is also stored, in case it is needed for debugging.
+# 
+# Also creates a logfile entry for each conversion.
+#
+# Todo:
+#
+# 1. This has only been tested on MacOS and Ubuntu and there are hardcoded 
+# PATH strings
+#
+# 2. The ly and pdf files are never removed, this is left to something else
+#
+# 3. The logfile isn't checked for length.
+#
+# David De Roure 31 January 2015
+
+# For ubuntu on demeter
+OUTDIR=/home/dder/www/NumbersIntoNotes/pdf
+URLBASE="http://demeter.oerc.ox.ac.uk/NumbersIntoNotes/pdf"
+LILYPOND=/usr/local/bin/lilypond
+PYTHON=/usr/bin/python2.7
+
+# For MacOS on Dave's laptop
+#OUTDIR=/Users/dave/Sites/pdf
+#URLBASE="http://localhost/~dave/pdf"
+#LILYPOND=/Applications/LilyPond.app/Contents/Resources/bin/lilypond
+#PYTHON=/Library/Frameworks/Python.framework/Versions/2.7/bin/python2.7
+
+TMP=/tmp/nin$$
+DATE=`/bin/date`
+
+cd /tmp # work somewhere other than the live Web space
+
+cat >> $OUTDIR/log.txt <<EOF
+[$DATE]
+Referer: $HTTP_REFERER
+User Agent: $HTTP_USER_AGENT
+IP Address: $REMOTE_ADDR
+EOF
+
+# Respond to GET request - this is used by Javascript in the client to 
+# test the availability of the CGI script
+
+if [ "$REQUEST_METHOD" == "GET" ]; then
+    echo  GET request received >> $OUTDIR/log.txt
+    echo Content-Type: text/html
+    echo
+    cat <<- EOF
+        <!DOCTYPE html>
+        <html>
+        <title>Numbers Into Notes Lilypond</title>
+        <body>
+        <p>User Agent: $HTTP_USER_AGENT</p>
+        <p>IP Address: $REMOTE_ADDR</p>
+        </body>
+        </html>
+	EOF
+    exit
+fi
+
+if [ "$REQUEST_METHOD" != "POST" ]; then
+    echo  Only GET and POST methods supported >> $OUTDIR/log.txt
+    echo 'Status: 405 Method Not Allowed'
+    echo
+    exit
+fi
+
+$PYTHON -c "import cgi, cgitb; form = cgi.FieldStorage(); print form.getvalue('lilytext')" > $TMP
+
+# validate input
+
+grep "NumbersIntoNotes ID " $TMP >> $OUTDIR/log.txt
+
+UUID=`sed -n 's/^% NumbersIntoNotes ID \([0-9a-f-]*\)$/\1/p' $TMP`
+
+if [ -z ${UUID} ] ; then
+    echo  Cannot find ID >> $OUTDIR/log.txt
+    rm -f $TMP
+    echo 'Status: 400 Bad Request'
+    echo
+    exit
+fi
+
+cp $TMP $OUTDIR/${UUID}.ly
+rm -f $TMP
+
+if [ ! -s $OUTDIR/${UUID}.ly ] ; then
+    echo  Creation of $OUTDIR/${UUID}.ly failed >> $OUTDIR/log.txt
+    echo 'Status: 400 Bad Request'
+    echo
+    exit
+fi
+
+echo Created $OUTDIR/${UUID}.ly >> $OUTDIR/log.txt
+
+# add unique ID to Lilypond source so we can cross-reference output
+
+ed $OUTDIR/${UUID}.ly >> $OUTDIR/log.txt 2>&1 <<EOF
+/\title/
+a
+  tagline = "Numbers into Notes $UUID"
+.
+w
+EOF
+
+echo $LILYPOND --output=$OUTDIR/${UUID} $OUTDIR/${UUID}.ly >> $OUTDIR/log.txt
+
+$LILYPOND --output=$OUTDIR/${UUID} $OUTDIR/${UUID}.ly >> $OUTDIR/log.txt 2>&1
+
+if [ $? -ne 0 ] ;  then
+    echo $LILYPOND failed >> $OUTDIR/log.txt
+    echo 'Status: 400 Bad Request'
+    echo
+    exit
+fi
+
+if [ ! -s $OUTDIR/${UUID}.pdf  ] ;  then
+    echo Lilypond output PDF not found >> $OUTDIR/log.txt
+    echo 'Status: 400 Bad Request'
+    echo
+    exit
+fi
+
+echo Created $OUTDIR/${UUID}.pdf >> $OUTDIR/log.txt
+
+
+echo "Content-type: application/pdf"
+echo ""
+cat $OUTDIR/${UUID}.pdf
+
+exit 0
+
+# End of lily

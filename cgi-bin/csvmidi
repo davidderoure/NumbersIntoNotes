@@ -1,0 +1,138 @@
+#!/bin/bash
+
+# Script to receive a CSV file from a POST request and convert it
+# to a Standard MIDI File which is stored for (temporary) web access 
+# the link returned in response.
+#
+# For now the source file is also stored, in case it is needed for debugging.
+# 
+# Also creates a logfile entry for each conversion.
+#
+# Todo:
+#
+# 1. This has only been tested on MacOS and Ubuntu and there are hardcoded 
+# PATH strings
+#
+# 2. The .csv and .mid files are never removed, this is left to something else
+#
+# 3. The logfile isn't checked for length.
+#
+# David De Roure 31 December 2015, updated 6 February 2016
+
+# For ubuntu on demeter
+OUTDIR=/home/dder/www/NumbersIntoNotes/midi
+URLBASE="http://demeter.oerc.ox.ac.uk/NumbersIntoNotes/midi"
+CSVMIDI=/usr/local/bin/csvmidi
+PYTHON=/usr/bin/python2.7
+
+# For MacOS on Dave's laptop
+#OUTDIR=/Users/dave/Sites/midi
+#URLBASE="http://localhost/~dave/midi"
+#CSVMIDI=/Users/dave/bin/csvmidi
+#PYTHON=/Library/Frameworks/Python.framework/Versions/2.7/bin/python2.7
+
+TMP=/tmp/nin$$
+DATE=`/bin/date`
+
+cd /tmp # work somewhere other than the live Web space
+
+cat >> $OUTDIR/log.txt <<EOF
+[$DATE]
+Referer: $HTTP_REFERER
+User Agent: $HTTP_USER_AGENT
+IP Address: $REMOTE_ADDR
+EOF
+
+# Respond to GET request - this is used by Javascript in the client to 
+# test the availability of the CGI script
+
+if [ "$REQUEST_METHOD" == "GET" ]; then
+    echo  GET request received >> $OUTDIR/log.txt
+    echo Content-Type: text/html
+    echo
+    cat <<- EOF
+	<!DOCTYPE html>
+	<html>
+	<title>Numbers Into Notes CSVMIDI</title>
+	<body>
+	<p>User Agent: $HTTP_USER_AGENT</p>
+	<p>IP Address: $REMOTE_ADDR</p>
+	</body>
+	</html>
+	EOF
+    exit
+fi
+
+if [ "$REQUEST_METHOD" != "POST" ]; then
+    echo  Only GET and POST methods supported >> $OUTDIR/log.txt
+    echo 'Status: 405 Method Not Allowed'
+    echo
+    exit
+fi
+
+$PYTHON -c "import cgi, cgitb; form = cgi.FieldStorage(); print form.getvalue('miditext')" > $TMP
+
+# validate input
+
+grep "Copyright_t, " $TMP >> $OUTDIR/log.txt
+
+UUID=`sed -n 's/.*Copyright_t, "\([0-9a-f-]*\)".*$/\1/p' $TMP`
+
+if [ -z ${UUID} ] ; then
+    echo  Cannot find ID >> $OUTDIR/log.txt
+    rm -f $TMP
+    echo 'Status: 400 Bad Request'
+    echo
+    exit
+fi
+
+cp $TMP $OUTDIR/${UUID}.csv
+rm -f $TMP
+
+if [ ! -s $OUTDIR/${UUID}.csv ] ; then
+    echo  Creation of $OUTDIR/${UUID}.csv failed >> $OUTDIR/log.txt
+    echo 'Status: 400 Bad Request'
+    echo
+    exit
+fi
+
+echo Created $OUTDIR/${UUID}.csv >> $OUTDIR/log.txt
+
+echo "$CSVMIDI -v $OUTDIR/${UUID}.csv > $OUTDIR/${UUID}.mid" >> $OUTDIR/log.txt
+
+$CSVMIDI -v $OUTDIR/${UUID}.csv > $OUTDIR/${UUID}.mid 2>> $OUTDIR/log.txt
+
+if [ $? -gt 0 ] ;  then
+    echo $CSVMIDI returned $? >> $OUTDIR/log.txt
+    echo 'Status: 400 Bad Request'
+    echo
+    exit
+fi
+
+if [ ! -s $OUTDIR/${UUID}.mid  ] ;  then
+    echo csvmidi output midi not found >> $OUTDIR/log.txt
+    echo 'Status: 400 Bad Request'
+    echo
+    exit
+fi
+
+cat << EOF
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Numbers Into Notes - Link to Standard MIDI File</title>
+</head>
+<body>
+<h1>Link to Standard MIDI File</h1>
+<p><a href="$URLBASE/${UUID}.mid" download>${UUID}</A> generated on $DATE</p>
+</body>
+</html>
+EOF
+
+echo Generated $URLBASE/${UUID}.mid >> $OUTDIR/log.txt
+
+exit 0
+
+# End of midi
