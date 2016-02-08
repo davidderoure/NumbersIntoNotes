@@ -1,0 +1,11 @@
+/* this prevents Chrome from leaving buttons highlighted */
+
+.btn.focus,.btn:active.focus,.btn.active.focus {
+    outline: none;
+}
+
+/* this prevents FireFox from having long number boxes */
+
+input[type="number"] {
+   width:50px;
+}
