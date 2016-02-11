@@ -138,6 +138,26 @@ function doFibonacci() {
     algorithm = "Fibonacci (n0=" + n0 + ", n1=" + n1 + ", k=" + k + ")";
 }
 
+// Generate sequence F(n+1) = F(n) + F(n-1) + F(n-2)
+// n0, n1 and n2 are obtained from DOM where they must be numbers
+
+function doTribonacci() {
+    seqLen = maxSeqLen;
+    var n0 = Number(document.getElementById("t0").value);
+    var n1 = Number(document.getElementById("t1").value);
+    var n2 = Number(document.getElementById("t2").value);
+
+    seq[0] = Big(n0);
+    seq[1] = Big(n1);
+    seq[2] = Big(n2);
+
+    for (var i=3; i < seqLen; i++) {
+       seq[i] = seq[i-1].plus(seq[i-2]).plus(seq[i-3]);
+    }
+    displaySequence();
+    algorithm = "Tribonacci (n0=" + n0 + ", n1=" + n1 + ", n2=" + n2 + ")";
+}
+
 // Generate sequence of base^i where i=0,1,..
 // base is obtained from DOM and corrected if out of range 2-99
 
@@ -475,6 +495,7 @@ function displaySequence(count, chars, width) {
             "50 decimal digits. </span>";
     }
     document.getElementById("colourexplanation").innerHTML = explain;
+    document.getElementById("reducebutton").disabled = false;
 }
 
 // Search OEIS
@@ -559,6 +580,7 @@ function displayModsequence() {
     document.getElementById("modsequence").value = 
         modSeq.slice(0, seqLen).join(" ");
     displayPeriod();
+    document.getElementById("displaybutton").disabled = false;
 }
 
 // updateModseq is called when the sequence has been edited manually.
@@ -760,7 +782,8 @@ function rollHeight(i) {
     drawRoll();
 }
 
-// conduct one generation of the Game of Life to enire number roll
+// conduct one generation of the Game of Life on number roll
+// (wrapped on a torus)
 // Uses notes of value 1
 
 function doLife() {
@@ -811,6 +834,43 @@ function doLife() {
             roll[i][j] = newroll[i][j]; 
         }
     }
+    drawRoll();
+}
+
+// Conduct an iteration a la Arnol'd Cat using Fibonacci
+// (x, y, n) -> (y % n, (x + y) % n)
+// Inspired by a suggestion by Lasse Rempe-Gillen
+// 11 Feb 2016
+
+function doCat() {
+    var newroll = [];
+
+    // we work on a square of side nRows
+
+    if (seqLen < nRows) { return; }
+
+    // initialize newroll
+
+    for (var x=0; x < nRows; x++) {
+        newroll[x] = [];
+    }
+
+    // perform one iteration from roll into newroll
+
+    for (var x=0; x < nRows; x++) {
+        for (var y=0; y < nRows; y++) {
+            newroll[y % nRows][ (x + y) % nRows] = roll[x][y];
+        }
+    }
+
+    // copy newroll into number roll
+
+    for (var x=0; x < nRows; x++) {
+        for (var y=0; y < nRows; y++) {
+            roll[x][y] = newroll[x][y]; 
+        }
+    }
+        
     drawRoll();
 }
 
@@ -1064,10 +1124,41 @@ function pushSelection() {
         }
     }
 
+    // stash the seletion string in the DOM so it can be saved
+
     if (selection.length && selection != selStack[selStack.length - 1]) {
         selStack.push(selection);
         document.getElementById("selection").value = selection;
     }
+
+    displayContour();
+}
+
+// Generate and display pitch contour of 12 symbols
+// NB pitch numbers are measured from top of roll
+   
+function displayContour() {
+    var tops = [];
+
+    for (var i=0; i < seqLen && tops.length < 12; i++) {
+        for (var j=0; j < nRows; j++) {
+            if (roll[i][j] > 1) {
+                tops.push(j);
+                break;
+            }
+        }
+    }
+    if (!tops) { return; }
+
+    var contour = "";
+    var last = tops[0];
+
+    for (var i=1; i < tops.length; i++) {
+        contour += (tops[i] > last) ? "D" : (tops[i] < last) ? "U" : "R";
+        last = tops[i];
+    }
+        
+    document.getElementById("contour").innerHTML = contour;
 }
 
 function popSelection() {
@@ -1211,8 +1302,12 @@ function setOctave(i) {
 }
 
 function setScale(s) {
+    if ( s == undefined ) {
+        throw "setScale expects array";
+    }
     scale = s;
-    var scaleString = document.getElementById('scale');
+
+    var scaleString = document.getElementById("scale");
     scaleString.value = s.join(" ");
     drawMap();
 }
@@ -1220,18 +1315,39 @@ function setScale(s) {
 // reGenerate uses the array of intervals to rebuild the scale
 
 function reGenerate() {
-    var s = document.getElementById('scale').value.split(" ");
-    var n;
+    var scaleString = document.getElementById('scale').value;
+    var s = [];
+    var ns = [];
 
-    for (var i=0; i < s.length; i++) {
-        n = Number(s[i]);
-        if (n > 0 && n < 24) {
-            scale[i] = n;
-        } else {
-            window.alert("Intervals must be between 1 and 23: " + s[i]);
-	    return;
+    // parse string into array s then create new scale array ns
+
+    s = scaleString.match(/(\d+)/g);
+    
+    if (s) {
+        for (var i=0; i < s.length; i++) {
+            ns[i] = Number(s[i]);
+            if (ns[i] < 1 || ns[i] > 23) {
+                window.alert("Intervals must be between 1 and 23: " + n);
+	        return;
+            }
+        }
+    } else {
+        // check for WH or TS notation instead of numbers
+        s = scaleString.match(/[WH]/g) || scaleString.match(/[TS]/g);
+        if (!s) {
+            window.alert("Intervals must be in format 2,2,1 or TTS or WWH");
+            return;
+        }
+        for (var i=0; i < s.length; i++) {
+            if ( s[i] == "H" || s[i] == "S" ) ns[i] = 1; 
+            else if ( s[i] == "W" || s[i] == "T" ) ns[i] = 2; 
         }
     }
+
+    // success show string and set scale array
+
+    document.getElementById('scale').value = s.join(" ");
+    scale = ns;
     drawMap();
 }
 
@@ -1326,7 +1442,7 @@ function lilyNotename(i) {
 //
 // Use <script src="soundfont-loader.min.js"></script>
 
-var audCon = null;;
+var audioCtx = null;;
 var piano = null;
 var notesPerBeat = 8; // default, until a play button is pressed
 var bpm = 60;
@@ -1334,39 +1450,72 @@ var inst = "acoustic_grand_piano";	// default, until setInstrument() called
 var audioInitialized = false;
 var extension = 1;
 var audioContexts = [];
+var audioSources = [];
+
+function playbuttonsDisabled(b) {
+    elements = document.getElementsByClassName("play");
+
+    for (var i=0; i < elements.length; i++) {
+        elements[i].disabled = b;
+    }
+}
+  
+// initAudio() is called when roll is displayed (Display button)
+// and hence always available as an audio reset to user
+ 
+function initAudio() {
+
+    playStop();
+
+    // clear up any existing contexts
+
+    for (var i=0; i < audioContexts.length; i++) {
+        audioContexts[i].close(); 
+    }
+    audioContexts = [];
+
+    audioInitialized = false;
+    playbuttonsDisabled(true);
+
+    startAudio();
+}
 
 // It takes a while to create the AudioContext and load a soundfont,
-// so the audCon is initialized as early as possible in the
-// interaction, not immediately before playing.
+// so the audioCtx is initialized as early as possible in the
+// interaction, not immediately before playing.  It is possible to 
+// do multiple startAudio()s, perhaps making different instruments.
 
-// Uses acoustic grand piano unless another instrument name is passed
-// e.g. harpsichord, church_organ, rock_organ, xylophone, orchestral_harp, ...
+function startAudio(inst) {
 
-function setInstrument(i) { 
-    inst = i; 
-    initAudio();
-}
-    
-function initAudio() {
-    audCon = new AudioContext(); 
-    audioContexts.push(audCon);
+    audioInitialized = false;
+    playbuttonsDisabled(true);
 
-    var soundfont = new Soundfont(audCon);
+    // make new context. Should be
+    // var audioCtx = new AudioContext();
+    // but catering for old browsers
+
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioContexts.push(audioCtx);
+
+    // make an instrument
+    // e.g. harpsichord, church_organ, rock_organ, xylophone, orchestral_harp, ...
+    // Default is acoustic grand piano.
+
+    var soundfont = new Soundfont(audioCtx);
 
     piano = soundfont.instrument( inst == undefined ? "acoustic_grand_piano" : inst );
     piano.onready(function() { 
         audioInitialized = true; 
+        playbuttonsDisabled(false);
         // console.log("Audio ready");
     });
 }
 
 function playStop() {
-    for (var i=0; i < audioContexts.length; i++) {
-        audioContexts[i].close(); 
+    for (var i=0; i < audioSources.length; i++) { 
+        audioSources[i] && audioSources[i].stop(0);
     }
-    audioContexts = [];
-    audioInitialized = false;
-    initAudio();
+    audioSources = [];
 }
 
 // note are usually of the duration corresponding to one
@@ -1409,8 +1558,8 @@ function playRoll(n) {
 
     if (!audioInitialized) { return; }
 
-    var time = audCon.currentTime + 0.1;
-    var duration = 60 / (bpm * notesPerBeat); // audCon uses seconds
+    var time = audioCtx.currentTime + 0.1;
+    var duration = 60 / (bpm * notesPerBeat); // audioCtx uses seconds
 
     var imin = selected ? selleft : 0;
     var imax = selected ? selright : seqLen - 1;
@@ -1418,8 +1567,8 @@ function playRoll(n) {
     for (var i=imin; i <= imax; i++) {
         for (j=0; j < nRows; j++) {
             if (roll[i][nRows - j - 1] > (selected ? 1 : 0)) {
-                piano.play(midiNoteName(midiNotes[j]), 
-                           time, duration * extension);
+                audioSources.push(piano.play(midiNoteName(midiNotes[j]), 
+                                             time, duration * extension));
             }
         }
         time += duration;
@@ -1514,6 +1663,8 @@ function writeMetadata() {
     var metaSelection_number = selected ? selected : seqLen;
 
     // fill out metadata with defaults
+
+    if (algorithm == "" || !seqLen || !nRows) { return; }
 
     mDate = Date();
 
@@ -1840,7 +1991,7 @@ function doSubmit() {
 }
 
 function playNote(note) {
-    piano.play(note, audCon.currentTime, 0.5);
+    piano.play(note, audioCtx.currentTime, 0.5);
 }
 
 // This createGuid code comes from 
