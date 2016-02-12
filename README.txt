@@ -37,7 +37,7 @@ functionality available for standalone demo purposes. Two POST
 actions in the HTML need to be edited to point at the appropriate
 server.)
 
-This version released 8 February 2016.
+This version released 12 February 2016.
 
 Thanks to Emily Howard and Lasse Rempe-Gillen for their inspiration
 through Ada sketches, to Pip Willcox for jointly organising the
