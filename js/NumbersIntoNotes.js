@@ -222,7 +222,9 @@ function doPrimes(n) {
     var sievesize = n ? n : 8 * maxSeqLen; 
     var primes = [];
 
-    for (var i=2; i < sievesize; i++) {
+    // We start at i=1 to return 1 as a prime. These days we'd start at 2.
+
+    for (var i=1; i < sievesize; i++) {
         primes[i] = true;
     }
     // mark multiples of primes as false
@@ -239,7 +241,7 @@ function doPrimes(n) {
 
     // copy n true primes into seq
 
-    var i = 2;
+    var i = 1;
     var j = 0;
 
     while (i < sievesize && j < maxSeqLen) {
