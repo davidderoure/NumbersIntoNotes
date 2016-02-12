@@ -8,7 +8,7 @@ Originally designed as a standalone demo to run on a laptop attached to a large 
 The three main modes of running this single page web application are described below.
 
 Online on the Web
-—----------------
+-----------------
 
 Normal use. The URL to the current server is
 
@@ -34,16 +34,8 @@ This can provide full functionality without being online but requires advanced s
 
 1. Edit the NumbersIntoNotes.js file to load the sound fonts locally from the sf directory (search for Soundfont).  You can then run offline.
 
-2. For notation support, install Lilypond on your machine
+2. For notation support, install Lilypond on your machine ( http://www.lilypond.org/ ), create a pdf directory (where PDFs and logs will be kept), and install the cgi-bin/lily script according to your server configuration, editing the hard paths in the script accordingly. Also edit the POST action in NumbersIntoNotes.html to call your CGI script.
 
-http://www.lilypond.org/
-
-Create a pdf directory (where PDFs and logs will be kept), and install the cgi-bin/lily script according to your server configuration, editing the hard paths in the script accordingly. Also edit the POST action in NumbersIntoNotes.html to call your CGI script.
-
-3. For MIDI support, install midicdv on your machine
-
-http://www.fourmilab.ch/webtools/midicsv/
-
-Create a midi directory on the server (where MIDI files and logs will be kept), and install the cgi-bin/csvmidi script according to your server configuration, editing the hard paths in the script accordingly. Also edit the POST action in NumbersIntoNotes.html to call your CGI script.
+3. For MIDI support, install midicdv on your machine ( http://www.fourmilab.ch/webtools/midicsv/ ), create a midi directory on the server (where MIDI files and logs will be kept), and install the cgi-bin/csvmidi script according to your server configuration, editing the hard paths in the script accordingly. Also edit the POST action in NumbersIntoNotes.html to call your CGI script.
 
 David De Roure 12 February 2016
