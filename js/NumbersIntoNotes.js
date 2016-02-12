@@ -1480,6 +1480,18 @@ function initAudio() {
     startAudio();
 }
 
+// Piano and Xylophone soundfonts can come off the local server, helps for
+// standalone demos
+
+/*
+Soundfont.nameToUrl = function(instName) { 
+    if (instName == "acoustic_grand_piano" ||
+        instName == "xylophone") {
+        return "sf/" + instName + "-ogg.js"; 
+    }
+}
+*/
+
 // It takes a while to create the AudioContext and load a soundfont,
 // so the audioCtx is initialized as early as possible in the
 // interaction, not immediately before playing.  It is possible to 
