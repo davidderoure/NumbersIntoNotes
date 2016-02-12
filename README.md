@@ -30,7 +30,11 @@ The notation and MIDI buttons will not appear.  Run it online to load the soundf
 Standalone using a local web server on your laptop
 --------------------------------------------------
 
-This can provide full functionality without being online but requires advanced setup. Download the distribution from github and install it to be served from your host. This will immediately run as with the zip file above but from localhost. There are three optional steps for additional functionality:
+This can provide full functionality without being online but requires advanced setup. Download the distribution from github and install it to be served from your host. This will immediately run as with the zip file above but from localhost; e.g.
+
+http://localhost/~dave/NumbersIntoNotes.html
+
+There are three optional steps for additional functionality:
 
 1. Edit the NumbersIntoNotes.js file to load the sound fonts locally from the sf directory (search for Soundfont).  You can then run offline.
 
@@ -38,8 +42,8 @@ This can provide full functionality without being online but requires advanced s
 
 3. For MIDI support, install midicsv on your machine ( http://www.fourmilab.ch/webtools/midicsv/ ), create a midi directory on the server (where MIDI files and logs will be kept), and install the cgi-bin/csvmidi script according to your server configuration, editing the hard paths in the script accordingly. Also edit the POST action in NumbersIntoNotes.html to call your CGI script.
 
-David De Roure 12 February 2016
+*David De Roure, 12 February 2016*
 
-Please email <a href=“mailto:umbersintonotes@gmail.com”>Numbers into Notes</a> with any questions, bug reports, and suggestions for new features. This application is currently only supported on Chrome and Firefox.
+Please email [Numbers into Notes] (mailto:numbersintonotes@gmail.com) with any questions, bug reports, and suggestions for new features. This application is currently only supported on Chrome and Firefox.
 
-Written by David De Roure, December 2015, for the Ada Lovelace Symposium and as an interactive demonstration to encourage discussion about music, mathematics, and programming at the time of Ada Lovelace. Thanks to Emily Howard and Lasse Rempe-Gillen for their inspiration through Ada sketches, to Pip Willcox for jointly organising the Numbers into Notes project, and to all our colleagues for feedback and ideas. This research is supported by the Transforming Musicology project funded by the Arts and Humanities Research Council, and the FAST project funded by the Engineering and Physical Sciences Research Council.
+Written by David De Roure, December 2015, for the Ada Lovelace Symposium and as an interactive demonstration to encourage discussion about music, mathematics, and programming at the time of Ada Lovelace. Thanks to *Emily Howard* and *Lasse Rempe-Gillen* for their inspiration through Ada sketches, to Pip Willcox for jointly organising the Numbers into Notes project, and to all our colleagues for feedback and ideas. This research is supported by the [Transforming Musicology] (http://www.transforming-musicology.org/) project funded by the Arts and Humanities Research Council, and the [FAST] (http://www.semanticaudio.ac.uk/) project funded by the Engineering and Physical Sciences Research Council.
