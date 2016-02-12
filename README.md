@@ -36,6 +36,10 @@ This can provide full functionality without being online but requires advanced s
 
 2. For notation support, install Lilypond on your machine ( http://www.lilypond.org/ ), create a pdf directory (where PDFs and logs will be kept), and install the cgi-bin/lily script according to your server configuration, editing the hard paths in the script accordingly. Also edit the POST action in NumbersIntoNotes.html to call your CGI script.
 
-3. For MIDI support, install midicdv on your machine ( http://www.fourmilab.ch/webtools/midicsv/ ), create a midi directory on the server (where MIDI files and logs will be kept), and install the cgi-bin/csvmidi script according to your server configuration, editing the hard paths in the script accordingly. Also edit the POST action in NumbersIntoNotes.html to call your CGI script.
+3. For MIDI support, install midicsv on your machine ( http://www.fourmilab.ch/webtools/midicsv/ ), create a midi directory on the server (where MIDI files and logs will be kept), and install the cgi-bin/csvmidi script according to your server configuration, editing the hard paths in the script accordingly. Also edit the POST action in NumbersIntoNotes.html to call your CGI script.
 
 David De Roure 12 February 2016
+
+Please email <a href=“mailto:umbersintonotes@gmail.com”>Numbers into Notes</a> with any questions, bug reports, and suggestions for new features. This application is currently only supported on Chrome and Firefox.
+
+Written by David De Roure, December 2015, for the Ada Lovelace Symposium and as an interactive demonstration to encourage discussion about music, mathematics, and programming at the time of Ada Lovelace. Thanks to Emily Howard and Lasse Rempe-Gillen for their inspiration through Ada sketches, to Pip Willcox for jointly organising the Numbers into Notes project, and to all our colleagues for feedback and ideas. This research is supported by the Transforming Musicology project funded by the Arts and Humanities Research Council, and the FAST project funded by the Engineering and Physical Sciences Research Council.
