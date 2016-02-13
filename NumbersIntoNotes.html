@@ -282,7 +282,8 @@ remainder, so all the numbers will be between 0 and <em>mod - 1</em>.
 
 <p>
 <button class="btn btn-success" onclick="doModsequence()" data-toggle="tooltip" data-placement="top" title="Reduce the numbers to the given modulus" id="reducebutton" disabled>Reduce</button>
-<em>mod:</em> <input type="number" id="modulus" value="35" min="2" max="128"></p>
+<em>mod:</em> <input type="number" id="modulus" value="35" min="2" max="128">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="primefactors" style="color:blue;"></span></p>
 
     </div>
    </div>
@@ -422,11 +423,12 @@ Pressing <em>Display</em> resets the display at any time.
     <input class="form-control" type="text" id="bpm" value="60">
    </div>
   </div>
-  <div class="col-md-2">
+  <div class="col-md-3">
    <div class="btn-group" role="group">
     <button class="btn btn-default" onclick="doLife()" data-toggle="tooltip" data-placement="top" title="Next generation of Life">Life</button>
     <button class="btn btn-default" onclick="doCat()" data-toggle="tooltip" data-placement="top" title="Iteration of Arnold Cat using Fibonacci">Cat</button>
    </div>
+   <small">&nbsp;&nbsp;<span id="pisano" style="color:blue;"></span></small>
   </div>
  </div>
 </div>

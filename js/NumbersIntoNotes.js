@@ -553,6 +553,77 @@ function doModsequence() {
        modSeq[i] = (Number(seq[i].mod(modulus)) + modulus) % modulus;
     }
     displayModsequence();
+    primeFactors(modulus);
+}
+
+// Display prime factorization of modulus
+
+// Make array of primes up to n with a sieve the modern way
+
+function primeFactors(n) {
+    var primes = sieve(Math.sqrt(n) + 1);
+    var factors = [];
+    var c;	// count of occurrences of current prime factor
+
+    for (var i=0; i < primes.length; i++) {
+        if (primes[i] * primes[i] > n) { break; }
+        c = 0;
+        while (n % primes[i] == 0) {
+            c++;
+            n = Math.floor(n / primes[i]);
+        }
+        if (c) {
+            factors.push([primes[i],c]);
+        }
+    }
+
+    if (n > 1) { 
+        factors.push([n,1]);
+    }
+
+    // write factors array into DOM
+
+    if (factors.length == 1 && factors[0][1] == 1) {
+        html="prime";
+    } else {
+        html = "";
+        for (var i=0; i < factors.length; i++) {
+            if (html) { html += " &times; " }
+            html += factors[i][0];
+            if (factors[i][1] > 1) { 
+                html += "<sup>" + factors[i][1] + "</sup>";
+            }
+        }
+    }
+
+    document.getElementById("primefactors").innerHTML = html;
+}
+
+function sieve(n) {
+    var sieve = [];
+
+    for (var i=2; i < n; i++) {
+        sieve[i] = true;
+    }
+
+    var maxi = Math.sqrt(n);
+
+    for (var i=2; i < maxi; i++) {
+        if (sieve[i] === true) {
+            for (var j = i * i; j < n; j += i) {
+                sieve[j] = false;
+            }
+        }
+    }
+
+    var primes = [];
+
+    for (var i=0; i < n; i++) {
+        if (sieve[i]) {
+            primes.push(i);
+        }
+    }
+    return primes;
 }
 
 // Logarithms are included to demonstrate issues of computational complexity
@@ -873,7 +944,32 @@ function doCat() {
         }
     }
         
+    var count = Number(document.getElementById("pisano").innerHTML);
+
+    if (!count) { count = pisanoPeriod(nRows); }
+    document.getElementById("pisano").innerHTML = (count == 1) ? "": count - 1;
+
     drawRoll();
+}
+
+// Lookup the Pisano period in a table from 1..128
+
+function pisanoPeriod(n) {
+    if (n == undefined || n < 1 || n > 128) { 
+        throw "pisanoPeriod takes 1..128: " + n;
+    }
+
+    return [1,3,8,6,20,24,16,12,24,60,10,24,
+           28,48,40,24,36,24,18,60,16,30,48,24,
+           100,84,72,48,14,120,30,48,40,36,80,24,
+           76,18,56,60,40,48,88,30,120,48,32,24,
+           112,300,72,84,108,72,20,48,72,42,58,120,
+           60,30,48,96,140,120,136,36,48,240,70,24,
+           148,228,200,18,80,168,78,120,216,120,168,48,
+           180,264,56,60,44,120,112,48,120,96,180,48,
+           196,336,120,300,50,72,208,84,80,108,72,72,
+           108,60,152,48,76,72,240,42,168,174,144,120,
+           110,60,40,30,500,48,256,192][n-1];
 }
 
 // mouse event handlers
@@ -1005,6 +1101,8 @@ function initRoll() {
     }
 
     rollempty = false;
+
+    document.getElementById("pisano").innerHTML = "";
 
     initSelectionmemory();
     drawRoll();
@@ -1304,9 +1402,7 @@ function setOctave(i) {
 }
 
 function setScale(s) {
-    if ( s == undefined ) {
-        throw "setScale expects array";
-    }
+    if ( s == undefined ) { throw "setScale expects array"; }
     scale = s;
 
     var scaleString = document.getElementById("scale");
