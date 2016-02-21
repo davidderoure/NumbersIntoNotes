@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script to receive a CSV file from a POST request and convert it
-# to a Standard MIDI File which is stored for (temporary) web access 
+# Script to receive a PROV-N file from a POST request and convert it
+# to an SVG File which is stored for (temporary) web access and
 # the link returned in response.
 #
 # For now the source file is also stored, in case it is needed for debugging.
@@ -17,18 +17,18 @@
 #
 # 3. The logfile isn't checked for length.
 #
-# David De Roure 31 December 2015, updated 6 February 2016
+# David De Roure 15 February 2016
 
 # For ubuntu on demeter
-OUTDIR=/home/dder/www/NumbersIntoNotes/midi
-URLBASE="http://demeter.oerc.ox.ac.uk/NumbersIntoNotes/midi"
-CSVMIDI=/usr/local/bin/csvmidi
+OUTDIR=/home/dder/www/NumbersIntoNotes/prov
+URLBASE="http://demeter.oerc.ox.ac.uk/NumbersIntoNotes/prov"
+CONVERT=/home/dder/ProvToolbox/bin/provconvert
 PYTHON=/usr/bin/python2.7
 
 # For MacOS on Dave's laptop
-#OUTDIR=/Users/dave/Sites/midi
-#URLBASE="http://localhost/~dave/midi"
-#CSVMIDI=/Users/dave/bin/csvmidi
+#OUTDIR=/Users/dave/Sites/prov
+#URLBASE="http://localhost/~dave/prov"
+#CONVERT=/Users/dave/bin/prov
 #PYTHON=/Library/Frameworks/Python.framework/Versions/2.7/bin/python2.7
 
 TMP=/tmp/nin$$
@@ -53,7 +53,7 @@ if [ "$REQUEST_METHOD" == "GET" ]; then
     cat <<- EOF
 	<!DOCTYPE html>
 	<html>
-	<title>Numbers Into Notes CSVMIDI</title>
+	<title>Numbers Into Notes PROV</title>
 	<body>
 	<p>User Agent: $HTTP_USER_AGENT</p>
 	<p>IP Address: $REMOTE_ADDR</p>
@@ -70,13 +70,15 @@ if [ "$REQUEST_METHOD" != "POST" ]; then
     exit
 fi
 
-$PYTHON -c "import cgi, cgitb; form = cgi.FieldStorage(); print form.getvalue('miditext')" > $TMP
+$PYTHON -c "import cgi, cgitb; form = cgi.FieldStorage(); print form.getvalue('provtext')" > $TMP
 
 # validate input
+ls -l $TMP >> $OUTDIR/log.txt
+cp $TMP $OUTDIR/foo
 
-grep "Copyright_t, " $TMP >> $OUTDIR/log.txt
+grep "NumbersIntoNotes ID " $TMP >> $OUTDIR/log.txt
 
-UUID=`sed -n 's/.*Copyright_t, "\([0-9a-f-]*\)".*$/\1/p' $TMP`
+UUID=`sed -n 's/^\/\/ NumbersIntoNotes ID \([0-9a-f-]*\)$/\1/p' $TMP`
 
 if [ -z ${UUID} ] ; then
     echo  Cannot find ID >> $OUTDIR/log.txt
@@ -86,50 +88,39 @@ if [ -z ${UUID} ] ; then
     exit
 fi
 
-cp $TMP $OUTDIR/${UUID}.csv
+cp $TMP $OUTDIR/${UUID}.provn
 rm -f $TMP
 
-if [ ! -s $OUTDIR/${UUID}.csv ] ; then
-    echo  Creation of $OUTDIR/${UUID}.csv failed >> $OUTDIR/log.txt
+if [ ! -s $OUTDIR/${UUID}.provn ] ; then
+    echo  Creation of $OUTDIR/${UUID}.provn failed >> $OUTDIR/log.txt
     echo 'Status: 400 Bad Request'
     echo
     exit
 fi
 
-echo Created $OUTDIR/${UUID}.csv >> $OUTDIR/log.txt
+echo Created $OUTDIR/${UUID}.provn >> $OUTDIR/log.txt
 
-echo "$CSVMIDI -v $OUTDIR/${UUID}.csv > $OUTDIR/${UUID}.mid" >> $OUTDIR/log.txt
+echo "$CONVERT -infile $OUTDIR/${UUID}.provn -outfile $OUTDIR/${UUID}.svg -title $UUID" >> $OUTDIR/log.txt
 
-$CSVMIDI -v $OUTDIR/${UUID}.csv > $OUTDIR/${UUID}.mid 2>> $OUTDIR/log.txt
+$CONVERT -infile $OUTDIR/${UUID}.provn -outfile $OUTDIR/${UUID}.svg -title $UUID 2>> $OUTDIR/log.txt
 
 if [ $? -gt 0 ] ;  then
-    echo $CSVMIDI returned $? >> $OUTDIR/log.txt
+    echo $CONVERT returned $? >> $OUTDIR/log.txt
     echo 'Status: 400 Bad Request'
     echo
     exit
 fi
 
-if [ ! -s $OUTDIR/${UUID}.mid  ] ;  then
-    echo csvmidi output midi not found >> $OUTDIR/log.txt
+if [ ! -s $OUTDIR/${UUID}.svg  ] ;  then
+    echo prov output SVG not found >> $OUTDIR/log.txt
     echo 'Status: 400 Bad Request'
     echo
     exit
 fi
 
-# return MIDI attachment for download
-
-echo "Content-type: application/octet-stream"
-echo "Content-disposition: attachment; filename=$UUID.mid"
+echo "Content-type: image/svg+xml"
 echo ""
-cat $OUTDIR/${UUID}.mid
-
-exit 0
-
-# return audio/midi to be handled by browser
-
-echo "Content-type: image/audio/midi"
-echo ""
-cat $OUTDIR/${UUID}.mid
+cat $OUTDIR/${UUID}.svg
 
 exit 0
 
@@ -141,17 +132,17 @@ Content-Type: text/html
 <!DOCTYPE html>
 <html>
 <head>
-<title>Numbers Into Notes - Link to Standard MIDI File</title>
+<title>Numbers Into Notes - Link to SVG File</title>
 </head>
 <body>
-<h1>Link to Standard MIDI File</h1>
-<p><a href="$URLBASE/${UUID}.mid" download>${UUID}</A> generated on $DATE</p>
+<h1>Link to SVG File</h1>
+<p><a href="$URLBASE/${UUID}.svg" download>${UUID}</A> generated on $DATE</p>
 </body>
 </html>
 EOF
 
-echo Generated $URLBASE/${UUID}.mid >> $OUTDIR/log.txt
+echo Generated $URLBASE/${UUID}.svg >> $OUTDIR/log.txt
 
 exit 0
 
-# End of midi
+# End of prov

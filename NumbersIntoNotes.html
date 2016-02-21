@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,7 +131,8 @@ known as the <em>base</em>.</p>
 
 <p></p>
 <button class="btn btn-default" onclick="doRandom()" data-toggle="tooltip" data-placement="top" title="Generate sequence of random numbers less than the given number">Random</button>
-<input type="number" id="random" value="84" min="2" max="999">
+<button class="btn btn-default" onclick="doDiceWalk()" data-toggle="tooltip" data-placement="top" title="Generate random interval between -5 and +5 using two dice">Dice</button>
+<input type="number" id="random" value="42" min="2" max="999">
 
     </div>
    </div>
@@ -648,7 +650,9 @@ files, or an image of the number roll.
 If you are running this web page from a server that supports
 conversions automatically then you will see <em>Generate PDF</em>
 and <em>Generate MIDI</em> buttons, which open a new browser window.
-Metadata specified here (e.g. a title) is included in the exported files.
+Metadata specified here (e.g. a title) is included in the exported files, and
+you can also generate a provenance graph which describes how your output
+was generated.
 </p>
 
   </div>
@@ -662,6 +666,7 @@ Metadata specified here (e.g. a title) is included in the exported files.
     <li><a href="#miditab" data-toggle="tab" onclick="outputMidiCsv()">MIDI</a></li>
     <li><a href="#imagetab" data-toggle="tab" onclick="outputImage()">Image</a></li>
     <li><a href="#metadatatab" data-toggle="tab">Metadata</a></li>
+    <li><a href="#provtab" data-toggle="tab" onclick="outputProv()">Provenance</a></li>
  </ul>
  <p></p>
  <div class="tab-content">
@@ -786,6 +791,25 @@ Metadata specified here (e.g. a title) is included in the exported files.
     </div>
    </div>
   </div>
+  <div class="tab-pane" id="provtab">
+   <div>
+    <div class="panel panel-info">
+     <div class="panel-heading">
+      <h3 class="panel-title">Provenance (prov-n)</h3>
+     </div>
+     <div class="panel-body">
+      <form role="form" id="provform" method="POST"
+	    action="http://demeter.oerc.ox.ac.uk/cgi-bin/prov"
+            target="_blank">
+       <div class="form-group">
+        <textarea id="provtext" name="provtext" rows="6" cols="120" placeholder="Text for copying " readonly></textarea>
+       </div>
+       <button class="btn btn-info" type="submit" id="provsubmit" value="Submit" display="none">Generate Graph</button>
+      </form>
+     </div>
+    </div>
+   </div>
+  </div>
  </div>
 </div>
 
@@ -828,7 +852,8 @@ but how might this have been coded for the Analytical Engine?
 The size of the sieve is estimated using a 1798 result by Legendre, and
 in those days 1 was considered to be a prime.</dd>
 <dt>Random</dt><dd>How could random numbers have been generated on
-the Analytical Engine?</dd>
+the Analytical Engine? Today we can generate music based on probabilities of
+note transitions, a mathematical approach we attribute to Markov born in 1856.</dd>
 <dt>Factorials</dt><dd>We see triangle numbers created by adding, and
 Factorials by multiplying, hence that the factorial sequence goes up much 
 more rapidly. The notation
