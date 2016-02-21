@@ -318,9 +318,7 @@ function doRandom() {
 
 // Generate 1D random walk.  Note the term "random walk" was introduced in 1905.
 // Uses same value from DOM as random, to set range (rows) of grid.
-// Finishes when hits boundary or at maxseqlen
-// eg for range of 42 it will travel 21 after 21^2 = 441 iterations on average
-// eg for range of 84 it will travel 42 after 42^2 = 1764 iterations on average
+// Finishes when hits boundary or at maxseqlen and sets seqlen accordingly.
 
 function doRandomWalk() {
     var n = Number(document.getElementById("random").value);
@@ -390,22 +388,22 @@ function doDiceWalk() {
         document.getElementById("random").value = 999;
     } 
     
-    seqLen = maxSeqLen;
-
     var x = Math.floor(n/2);	// starting position is half way up
     seq[0] = Big(x);
     var updice, downdice;	// calculated separately so rolls could be displayed
-    var i;
+    
+    seqLen = maxSeqLen;
 
-    for (i=1; i < seqLen; i++) {
+    for (i=1; i < maxSeqLen; i++) {
        updice = Math.floor(Math.random() * 6) + 1;
        downdice = Math.floor(Math.random() * 6) + 1;
        x += updice - downdice;
-       if (x < 0 || x >= n) { x = Math.floor(n/2); }
+       if (x < 0 || x >= n) { 
+            seqLen = i; 
+            x = Math.floor(n/2); 
+       }
        seq[i] = Big(x);
     }
-
-    seqlen = i;
 
     document.getElementById("modulus").value = n;
     displaySequence();

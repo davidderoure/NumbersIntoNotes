@@ -131,7 +131,7 @@ known as the <em>base</em>.</p>
 
 <p></p>
 <button class="btn btn-default" onclick="doRandom()" data-toggle="tooltip" data-placement="top" title="Generate sequence of random numbers less than the given number">Random</button>
-<button class="btn btn-default" onclick="doDiceWalk()" data-toggle="tooltip" data-placement="top" title="Generate random interval between -5 and +5 using two dice">Dice</button>
+<button class="btn btn-default" onclick="doDiceWalk()" data-toggle="tooltip" data-placement="top" title="Walk random intervals by rolling two dice">Dice</button>
 <input type="number" id="random" value="42" min="2" max="999">
 
     </div>
@@ -852,8 +852,10 @@ but how might this have been coded for the Analytical Engine?
 The size of the sieve is estimated using a 1798 result by Legendre, and
 in those days 1 was considered to be a prime.</dd>
 <dt>Random</dt><dd>How could random numbers have been generated on
-the Analytical Engine? Today we can generate music based on probabilities of
-note transitions, a mathematical approach we attribute to Markov born in 1856.</dd>
+the Analytical Engine? Musical dice games (Musikalisches Würfelspiel) were
+popular in the 1700s. Today we analyse and generate music using probabilities
+of note and chord ransitions, using a mathematical approach due to Markov born 
+in 1856.</dd>
 <dt>Factorials</dt><dd>We see triangle numbers created by adding, and
 Factorials by multiplying, hence that the factorial sequence goes up much 
 more rapidly. The notation
@@ -929,6 +931,6 @@ in order to analyse and report on usage.
 <script src="js/Ratio-0.4.1.min.js" type="text/javascript"></script>
 <script src="js/ada-bernoulli.js" type="text/javascript"></script>
 <script src="js/soundfont-player.min.js" type="text/javascript"></script>
-<script src="js/NumbersIntoNotes.js" type="text/javascript"></script>
+<script src="js/NumbersIntoNotes.min.js" type="text/javascript"></script>
 </body>
 </html>
