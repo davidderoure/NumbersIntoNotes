@@ -38,7 +38,8 @@ var maxSeqLen = 256;	// Default length of several generated number sequences
 			// and piano roll, 256 allows for 32 bars of 1/8 beats
 var seqLen = 0;		// Actual length, set in Section 1
 
-var algorithm = "";	// description of sequence, used in metadata
+var algorithm = "";	// name of generating algorithm, used in metadata
+var parameters = [];	// parameters, used in metadata
 
 // Use <script src="big.js"></script>
 
@@ -92,7 +93,8 @@ function doArithmetic() {
        seq[i] = seq[i-1].plus(d);
     }
     displaySequence();
-    algorithm = "Arithmetic progression (a=" + a + ", d= " + d + ")";
+    algorithm = "Arithmetic progression";
+    parameters = [["a", a], ["d", d]];
 }
 
 function doFactorial() {
@@ -103,6 +105,7 @@ function doFactorial() {
     }
     displaySequence();
     algorithm = "Factorial";
+    parameters = [];
 }
 
 function doTriangle() {
@@ -113,6 +116,7 @@ function doTriangle() {
     }
     displaySequence();
     algorithm = "Triangular";
+    parameters = [];
 }
 
 // Generate sequence F(n+1) = kF(n) + F(n-1)
@@ -135,7 +139,8 @@ function doFibonacci() {
        seq[i] = (seq[i-1].times(k)).plus(seq[i-2]);
     }
     displaySequence();
-    algorithm = "Fibonacci (n0=" + n0 + ", n1=" + n1 + ", k=" + k + ")";
+    algorithm = "Fibonacci";
+    parameters = [["n0", n0],["n1", n1],["k", k]];
 }
 
 // Generate sequence F(n+1) = F(n) + F(n-1) + F(n-2)
@@ -155,7 +160,8 @@ function doTribonacci() {
        seq[i] = seq[i-1].plus(seq[i-2]).plus(seq[i-3]);
     }
     displaySequence();
-    algorithm = "Tribonacci (n0=" + n0 + ", n1=" + n1 + ", n2=" + n2 + ")";
+    algorithm = "Tribonacci";
+    parameters = [["n0", n0],["n1", n1],["n2", n2]];
 }
 
 // Generate sequence of base^i where i=0,1,..
@@ -173,7 +179,8 @@ function doPowers() {
        seq[i] = seq[i-1].times(b);
     }
     displaySequence();
-    algorithm = "Power (b=" + b + ")";
+    algorithm = "Power";
+    parameters = [["base", b]];
 }
 
 // Generate all the primes up to n using Sieve of Eratosthenes
@@ -253,6 +260,7 @@ function doPrimes(n) {
     seqLen = j;
     displaySequence();
     algorithm = "Primes";
+    parameters = [];
 }
 
 // Mathematical functions with bounded values (e.g. digits, periodic).
@@ -279,12 +287,12 @@ function doSin() {
     if (a > 63) {
         document.getElementById("modulus").value = a + a + 1;
     }
-    algorithm = "Sin (a=" + a + ", r=" + r + ")";
+    algorithm = "Sin";
+    parameters = [["a", a],["r", r]];
 }
 
 // Generate random number between 0 and n-1
 // n is obtained from DOM and corrected if out of range 2-999
-// Default modulus is set to 10
 
 function doRandom() {
     var n = Number(document.getElementById("random").value);
@@ -304,7 +312,105 @@ function doRandom() {
     }
     document.getElementById("modulus").value = n;
     displaySequence();
-    algorithm = "Random (n=" + n + ")";
+    algorithm = "Random";
+    parameters = [["n", n]];
+}
+
+// Generate 1D random walk.  Note the term "random walk" was introduced in 1905.
+// Uses same value from DOM as random, to set range (rows) of grid.
+// Finishes when hits boundary or at maxseqlen
+// eg for range of 42 it will travel 21 after 21^2 = 441 iterations on average
+// eg for range of 84 it will travel 42 after 42^2 = 1764 iterations on average
+
+function doRandomWalk() {
+    var n = Number(document.getElementById("random").value);
+
+    if (n < 2) {
+        n = 2;
+        document.getElementById("random").value = 2;
+    } else if (n > 999) {
+        n = 999;
+        document.getElementById("random").value = 999;
+    } 
+    
+    seqLen = maxSeqLen;
+
+    var x = Math.floor(n/2);
+    seq[0] = Big(x);
+    var i;
+
+    for (i=1; i < seqLen; i++) {
+       x += Math.random() < 0.5 ? -1 : 1;    // toss coin
+       if (x < 0 || x == n) { break; }
+       seq[i] = Big(x);
+    }
+
+    seqlen = i;
+
+    document.getElementById("modulus").value = n;
+    displaySequence();
+    algorithm = "Random Walk";
+    parameters = [["n", n]];
+}
+
+// Generate random walk using intervals chosen by dice roll.
+// There is no particular historical basis for this, but it
+// is introduced in order to discuss probabilities of note transitions
+// and therefore Markov (who was born just after Lovelace died).
+// Perhaps a nod also to Mozart and dice but that was different.
+// The idea here is to roll two dice, one counts the note up in pitch and 
+// the other counts down.  This limits the size of heptatonic intervals 
+// within the octave and favours smaller intervals (you could analyse music
+// from the time of Lovelace to find out what probabilities they might have
+// used instead):
+// 
+//  0  1,1 2,2 3,3 4,4 5,5 6,6  -  6 ways, probability 6 in 36 = 1/6  ~ 17% (17%)
+// +1  2,1 3,2 4,3 5,4 6,5      -  5 ways, probability 5 in 36 = 5/36 ~ 14% (28%)
+// +2  3,1 4,2 5,3 6,4          -  4 ways, probability 4 in 36 = 1/9  ~ 11% (22%)
+// +3  4,1 5,2 6,3              -  3 ways, probability 3 in 36 = 1/12 ~ 8%  (17%)
+// +4  5,1 6,2                  -  2 ways, probability 2 in 36 = 1/18 ~ 6%  (11%)
+// +5  6,1                      -  1 way,  probability 1 in 36 = 1/36 ~ 3%  ( 6%)
+// 
+// Uses same value from DOM as random, to set range (rows) of grid.
+// Resets to start position when hits boundary, continues to maxSeqLen
+// For range of 10 the average chain length empirically seems to be 7 
+// For range of 21 the average chain length empirically seems to be 24 ish
+// For range of 42 the average chain length empirically seems to be 85 ish
+// For range of 84 the average chain length empirically seems to be 320 ish
+// For range of 100 the average chain length empirically seems to be 450 ish
+
+function doDiceWalk() {
+    var n = Number(document.getElementById("random").value);
+
+    if (n < 2) {
+        n = 2;
+        document.getElementById("random").value = 2;
+    } else if (n > 999) {
+        n = 999;
+        document.getElementById("random").value = 999;
+    } 
+    
+    seqLen = maxSeqLen;
+
+    var x = Math.floor(n/2);	// starting position is half way up
+    seq[0] = Big(x);
+    var updice, downdice;	// calculated separately so rolls could be displayed
+    var i;
+
+    for (i=1; i < seqLen; i++) {
+       updice = Math.floor(Math.random() * 6) + 1;
+       downdice = Math.floor(Math.random() * 6) + 1;
+       x += updice - downdice;
+       if (x < 0 || x >= n) { x = Math.floor(n/2); }
+       seq[i] = Big(x);
+    }
+
+    seqlen = i;
+
+    document.getElementById("modulus").value = n;
+    displaySequence();
+    algorithm = "Dice";
+    parameters = [["n", n]];
 }
 
 // Calculate pi using the Machin formula.  The last digits will be dodgy but
@@ -329,6 +435,7 @@ function doPi(n) {
     document.getElementById("modulus").value = 10;
     displaySequence();
     algorithm = "Pi";
+    parameters = [];
 }
 
 // arctan comes from https://github.com/MikeMcl/decimal.js/issues/9
@@ -375,6 +482,7 @@ function doPhi(n) {
     document.getElementById("modulus").value = 10;
     displaySequence();
     algorithm = "Golden Ratio";
+    parameters = [];
 }
 
 // Calculate Bernouill numbers using ada-bernoulli, copied from
@@ -397,6 +505,7 @@ function doBernoullinumerators(n) {
     }
     displaySequence();
     algorithm = "Bernoulli Numerators";
+    parameters = [];
 }
 
 function doBernoullidenominators(n) {
@@ -408,6 +517,7 @@ function doBernoullidenominators(n) {
     }
     displaySequence();
     algorithm = "Bernoulli Denominators";
+    parameters = [];
 }
 
 // Precanned sequences can be set in the HTML.
@@ -430,6 +540,8 @@ function setSeq(s) {
     }
     seqLen = i;
     displaySequence();
+    algorithm = "Preset";
+    parameters = [];
 }
 
 // Display generated sequence, until count numbers or chars characters
@@ -1710,12 +1822,19 @@ function playRoll(n) {
 // These variables hold metadata strings which are set in updateMetadata()
 // and used in multiple export functions
 
+// mutable by user
 var mTitle = "";
 var mCreator = "";
 var mExplanation = "";
-var mDate = "";
-var mGuid = ""; // unique ID generated here and passed to server undedited
 var mId = "";	// ID provided by user, defaults to guid
+
+// immutable by user
+var mDate = "";		// date
+var mGuid = ""; 	// unique ID generated here
+var mScale = "";	// scale as strng of generating intervals
+var mSelection_n = 0;	// number of notes in selection
+var mSelection_bl = ""; // bottom left vertex of selection
+var mSelection_tr = ""; // top right vertex of selection
 
 // Test (asynchronously) to see if we currently have access to the CGI 
 // scripts needed for exporting, and make submit button visible if we do.
@@ -1744,6 +1863,7 @@ function checkCGI(script, id)
 function initExport() {
     var midiaction = document.getElementById("midiform").action;
     var lilyaction = document.getElementById("lilyform").action;
+    var provaction = document.getElementById("provform").action;
 
     if (lilyaction != "") {
         checkCGI(lilyaction, "lilysubmit");
@@ -1751,6 +1871,10 @@ function initExport() {
 
     if (midiaction != "") {
         checkCGI(midiaction, "midisubmit");
+    }
+
+    if (provaction != "") {
+        checkCGI(midiaction, "provsubmit");
     }
 
     writeMetadata();
@@ -1762,15 +1886,22 @@ function initExport() {
 function writeMetadata() {
     var metaSequence = seq.slice(0, seqLen > 10 ? 10 : seqLen).join(",");
     var metaNumbers = modSeq.slice(0, seqLen > 10 ? 10 : seqLen).join(",");
-    var metaScale = scale.join(",");
 
-    var metaSelection_bl =
+    mScale = scale.join(",");
+
+    mSelection_bl =
         selected ? selleft + "," + midiNoteName(midiNotes[nRows - seltop - 1])
                   : "0," + midiNoteName(midiNotes[0]);
-    var metaSelection_tr =
+    mSelection_tr =
         selected ? selright + "," + midiNoteName(midiNotes[nRows - selbot - 1])
                   : (seqLen - 1) + "," + midiNoteName(midiNotes[nRows - 1]);
-    var metaSelection_number = selected ? selected : seqLen;
+    mSelection_n = selected ? selected : seqLen;
+
+    var parameterString = "";
+    for (var i=0; i < parameters.length; i++) {
+        if (parameterString) { parameterString += ", "; }
+        parameterString += parameters[i][0] + "=" + parameters[i][1];
+    }
 
     // fill out metadata with defaults
 
@@ -1780,13 +1911,15 @@ function writeMetadata() {
 
     mGuid = createGuid();
 
-    mExplanation = algorithm + (modulus ? " mod " + modulus : "") +
-        " on " + seqLen + " x " + nRows + 
+    mExplanation = algorithm;
+    if (parameterString) { mExplanation += " (" + parameterString + ")"; }
+    if (modulus) { mExplanation += " mod " + modulus; }
+    mExplanation +=  " on " + seqLen + " x " + nRows + 
         " number roll with 0 mapped to " + notes[pitch] + octave + 
-        " and scale generated on intervals " + metaScale + 
-        ", playing with " + metaSelection_number + 
-        " notes selected in [" + metaSelection_bl + 
-        "] to [" + metaSelection_tr + "] at tempo " + bpm + 
+        " and scale generated on intervals " + mScale + 
+        ", playing with " + mSelection_n + 
+        " notes selected in [" + mSelection_bl + 
+        "] to [" + mSelection_tr + "] at tempo " + bpm + 
         "bpm, created on " + mDate + 
         ". The first numbers in the original sequence are " + metaSequence +
         " and in the reduced sequence are " + metaNumbers + "."
@@ -1796,31 +1929,32 @@ function writeMetadata() {
     document.getElementById("metaDate").value = mDate;
     document.getElementById("metaIdentifier").value = mGuid;
 
+    // immutable
     document.getElementById("metaSequence").innerHTML = metaSequence;
     document.getElementById("metaPitch").innerHTML = notes[pitch];
     document.getElementById("metaOctave").innerHTML = octave;
-    document.getElementById("metaScale").innerHTML = metaScale;
+    document.getElementById("metaScale").innerHTML = mScale;
     document.getElementById("metaTempo").innerHTML = bpm;
     document.getElementById("metaRows").innerHTML = nRows;
     document.getElementById("metaColumns").innerHTML = seqLen;
     document.getElementById("metaSelection").innerHTML = 
-        metaSelection_bl + "," + metaSelection_tr + "," + metaSelection_number;
+        mSelection_n + " [" + mSelection_bl + "],[" + mSelection_tr + "]";
 }
 
 // read metadata values back from DOM
-// Note mGuid is not editable by user
+// Note only Title, Creator, Explanation, and Id are editable by user
 
 function readMetadata() {
     mTitle = document.getElementById("metaTitle").value;
     mCreator = document.getElementById("metaCreator").value;
     mExplanation = document.getElementById("metaDescription").value;
-    mDate = document.getElementById("metaDate").value;
     mId = document.getElementById("metaIdentifier").value;
 }
 
 function outputAll() {
     outputNoteNames();
     outputMidiCsv();
+    outputProv();
     outputLilypond();
 }
 
@@ -2094,6 +2228,60 @@ function outputMidiCsv() {
         rollbuffer += output[i] + "\n";
     }
     document.getElementById("miditext").value = rollbuffer;
+}
+
+// W3C prov-n format
+
+function outputProv() {
+
+    var parameterString = "";
+    for (var i=0; i < parameters.length; i++) {
+        if (parameterString) { parameterString += ", "; }
+        parameterString += "nin:" + parameters[i][0] + 
+                           "=\"" + parameters[i][1] + "\"";
+    }
+
+    var output = [
+        "// " + mTitle,
+        "// " + mDate,
+        "document",
+        "// Stage 1 - Generate Integers",
+        "prefix prov <http://www.w3.org/ns/prov#>",
+        "prefix nin <http://www.nin.oerc.ox.ac.uk/var#>",
+        "entity(nin:IntegerSequence)",
+        "activity(nin:" + algorithm + (parameterString ? 
+            ", [" + parameterString + "])" : ")"),
+        "wasGeneratedBy(nin:IntegerSequence, nin:" + algorithm + ", -)",
+        "// Stage 2 - Clock Arithmetic",
+        "entity(nin:ModSequence)",
+        "activity(nin:ReduceByModulus, [nin:mod=\"" + modulus + "\"])",
+        "wasGeneratedBy(nin:ModSequence, nin:ReduceByModulus, -)",
+        "used(nin:ReduceByModulus, nin:IntegerSequence, -)",
+        "// Stage 3 - Play",
+        "entity(nin:Selection)",
+        "activity(nin:Select, [prov:type=\"edit\"" + 
+            ", nin:count=\"" + mSelection_n + "\"" +
+            ", nin:bl=\"" + mSelection_bl + "\"" +
+            ", nin:tr=\"" + mSelection_tr + "\"])",
+        "wasGeneratedBy(nin:Selection, nin:Select, -)",
+        "used(nin:Select, nin:ModSequence, -)",
+        "entity(nin:Composer)",
+        "agent(nin:Composer, [prov:type=\"prov:Person\"])",
+        "wasAssociatedWith(nin:Selection, nin:Composer, -)",
+        "entity(nin:Notes)",
+        "activity(nin:Map, [nin:pitch=\"" + pitch + "\", nin:octave=\"" 
+                          + octave + "\", nin:scale=\"" + mScale + "\"])",
+        "wasGeneratedBy(nin:Notes, nin:Map, -)",
+        "used(nin:Map, nin:Selection, -)",
+        "// Stage 4 - Export",
+        "entity(nin:midi/" + mGuid + ", [prov:type=\"document\"])",
+        "activity(nin:Export)",
+        "wasGeneratedBy(nin:midi/" + mGuid + ", nin:Export, -)",
+        "used(nin:Export, nin:Notes, -)",
+        "endDocument",
+        "// NumbersIntoNotes ID " + mGuid ];
+
+    document.getElementById("provtext").value = output.join("\n");
 }
 
 function doSubmit() {
