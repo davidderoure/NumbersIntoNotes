@@ -2598,20 +2598,33 @@ function outputMeld() {
 
     var output = [];
 
-    output.push("{");
-    output.push("  \"@type\": \"http://purl.org/ontology/mo/Score\",");
-    output.push("  \"http://localhost/NiN/firstNote\": \"" + firstnote + "\",");
-    output.push("  \"http://localhost/NiN/key\": \"" + meldKey + "\",");
-    output.push("  \"http://localhost/NiN/mode\": \"" + meldMode + "\",");
-    output.push("  \"http://localhost/NiN/lastNote\": \"" + lastnote + "\",");
-    output.push("  \"http://localhost/NiN/tempo\": \"" + meldBpm + "\",");
-    output.push("  \"http://purl.org/dc/elements/1.1/creator\": \"" + meldCreator + "\",");
-    output.push("  \"http://purl.org/dc/elements/1.1/title\": \"" + meldTitle + "\",");
-    output.push("  \"http://purl.org/ontology/mo/published_as\": { ");
-    output.push("    \"@id\": \"http://numbersintonotes.net/meld/" + meldId + ".rdf\"");
-    output.push("  }");
-    output.push("}");
+    output.push("@prefix mo: <http://purl.org/ontology/mo/> .");
+    output.push("@prefix dc: <http://purl.org/dc/elements/> .");
+    output.push("@prefix nin: <http://numbersintonotes.net/terms#> .");
+    output.push("");
+    output.push("<> a mo:Score ;");
+    output.push("  mo:published_as <http://beta.numbersintonotes.net/mei/" + meldId + ".mei> ;");
+    output.push("  dc:creator \"" + meldCreator + "\" ;");
+    output.push("  dc:title \"" + meldTitle + "\" ;");
+    output.push("  nin:firstNote \"" + firstnote + "\" ;");
+    output.push("  nin:key \"" + meldKey + "\" ;");
+    output.push("  nin:mode \"" + meldMode + "\" ;");
+    output.push("  nin:lastNote \"" + lastnote + "\" ;");
+    output.push("  nin:tempo \"" + meldBpm + "\" .");
 
+//    output.push("{");
+//    output.push("  \"@type\": \"http://purl.org/ontology/mo/Score\",");
+//    output.push("  \"http://localhost/NiN/firstNote\": \"" + firstnote + "\",");
+//    output.push("  \"http://localhost/NiN/key\": \"" + meldKey + "\",");
+//    output.push("  \"http://localhost/NiN/mode\": \"" + meldMode + "\",");
+//    output.push("  \"http://localhost/NiN/lastNote\": \"" + lastnote + "\",");
+//    output.push("  \"http://localhost/NiN/tempo\": \"" + meldBpm + "\",");
+//    output.push("  \"http://purl.org/dc/elements/1.1/creator\": \"" + meldCreator + "\",");
+//    output.push("  \"http://purl.org/dc/elements/1.1/title\": \"" + meldTitle + "\",");
+//    output.push("  \"http://purl.org/ontology/mo/published_as\": { ");
+//    output.push("    \"@id\": \"http://numbersintonotes.net/meld/" + meldId + ".rdf\"");
+//    output.push("  }");
+//    output.push("}");
 
     var rollbuffer = ""; // encodes text for copy and paste at client
 

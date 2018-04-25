@@ -1713,18 +1713,20 @@ function startAudio(inst) {
     // make new context. Should be
     // var audioCtx = new AudioContext();
     // but catering for old browsers
+    // audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtx = new AudioContext();
     audioContexts.push(audioCtx);
 
     // make an instrument
     // e.g. harpsichord, church_organ, rock_organ, xylophone, orchestral_harp, ...
     // Default is acoustic grand piano.
 
-    var soundfont = new Soundfont(audioCtx);
+    var pianoPromise = Soundfont.instrument(audioCtx, 
+                  inst == undefined ? "acoustic_grand_piano" : inst );
 
-    piano = soundfont.instrument( inst == undefined ? "acoustic_grand_piano" : inst );
-    piano.onready(function() { 
+    pianoPromise.then(function(p) { 
+        piano = p;
         audioInitialized = true; 
         playbuttonsDisabled(false);
         // console.log("Audio ready");
@@ -1733,7 +1735,7 @@ function startAudio(inst) {
 
 function playStop() {
     for (var i=0; i < audioSources.length; i++) { 
-        audioSources[i] && audioSources[i].stop(0);
+        audioSources[i] && audioSources[i].stop();
     }
     audioSources = [];
 }
