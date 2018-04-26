@@ -670,7 +670,7 @@ was generated.
     <li><a href="#imagetab" data-toggle="tab" onclick="outputImage()">Image</a></li>
     <li><a href="#metadatatab" data-toggle="tab">Metadata</a></li>
     <li><a href="#provtab" data-toggle="tab" onclick="outputProv()">Provenance</a></li>
-    <li><a href="#meldtab" data-toggle="tab" onclick="outputMeld()">MELD</a></li>
+    <li><a href="#meldtab" data-toggle="tab" onclick="outputMei();outputMeld();">MELD</a></li>
     <li><a href="#oretab" data-toggle="tab" onclick="outputOre()">OAI-ORE</a></li>
  </ul>
  <p></p>
@@ -822,6 +822,7 @@ was generated.
       <h3 class="panel-title">Provenance (prov-n)</h3>
      </div>
      <div class="panel-body">
+      <!-- when generating MELD output, first post MEI -->
       <form role="form" id="provform" method="POST"
 	    action="http://beta.numbersintonotes.net/cgi-bin/prov"
             target="_blank">
@@ -843,9 +844,13 @@ was generated.
      <div class="panel-body">
       <form role="form" id="meldform" method="POST"
 	    action="http://beta.numbersintonotes.net/cgi-bin/meld"
-            target="_blank">
+            target="_blank"
+            onsubmit="document.getElementById('meiform').submit()">
        <div class="form-group">
         <textarea id="meldtext" name="meldtext" rows="6" cols="120" placeholder="Text for copying " readonly></textarea>
+       </div>
+       <div class="form-group">
+        <input class="form-control" id="meldworkset" name="meldworkset" type="text" placeholder="Location of MELD workset to add to"/>
        </div>
        <button class="btn btn-info" type="submit" id="meldsubmit" value="Submit" display="none">Generate MELD</button>
       </form>
