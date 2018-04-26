@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to receive an MEI file from a POST request and store
+# Script to receive a MELD file from a POST request and store
 # for (temporary) web access, the link returned in response.
 #
 # Also creates a logfile entry for each file stored.
@@ -10,22 +10,27 @@
 # 1. This has only been tested on Ubuntu and there are hardcoded 
 # PATH strings
 #
-# 2. The .mei files are never removed, this is left to something else
+# 2. The .ttl RDF files are never removed, this is left to something else
 #
 # 3. The logfile isn't checked for length.
 #
-# David De Roure 12 December 2017.
+# David De Roure 1 January 2018.
+
+# For redhat on thalassa
+OUTDIR=/var/www/html/meld
+URLBASE="http://beta.numbersintonotes.net/meld"
+PYTHON=/usr/bin/python2.7
 
 # For ubuntu on demeter
-OUTDIR=/home/dder/www/NumbersIntoNotes/mei
-URLBASE="http://numbersintonotes.net/mei"
-PYTHON=/usr/bin/python2.7
-IDS=ids.txt
+#OUTDIR=/home/dder/www/NumbersIntoNotes/mei
+#URLBASE="http://numbersintonotes.net/mei"
+#PYTHON=/usr/bin/python2.7
 
 # For MacOS on Dave's laptop
 #OUTDIR=/Users/dave/Sites/midi
 #URLBASE="http://localhost/~dave/midi"
 #PYTHON=/Library/Frameworks/Python.framework/Versions/2.7/bin/python2.7
+
 TMP=/tmp/nin$$
 DATE=`/bin/date`
 
@@ -65,13 +70,13 @@ if [ "$REQUEST_METHOD" != "POST" ]; then
     exit
 fi
 
-$PYTHON -c "import cgi, cgitb; form = cgi.FieldStorage(); print form.getvalue('meitext')" > $TMP
+$PYTHON -c "import cgi, cgitb; form = cgi.FieldStorage(); print form.getvalue('meldtext')" > $TMP
 
 # validate input
 
-grep "<<title type=\"subordinate\">" $TMP >> $OUTDIR/log.txt
+grep "http://beta.numbersintonotes.net/mei/" $TMP >> $OUTDIR/log.txt
 
-UUID=`sed -n 's/.*<title type=.subordinate.>\([0-9a-f-]*\).*$/\1/p' $TMP`
+UUID=`sed -n 's/.*\/mei\/\([0-9a-f-]*\).*$/\1/p' $TMP`
 
 if [ -z ${UUID} ] ; then
     echo  Cannot find ID >> $OUTDIR/log.txt
@@ -81,23 +86,20 @@ if [ -z ${UUID} ] ; then
     exit
 fi
 
-# cp $TMP $OUTDIR/${UUID}.mei
-
-sed -e '/^<!--/,$d' $TMP > $OUTDIR/${UUID}.mei
-sed -n -e 's/^!//p' $TMP > $OUTDIR/${UUID}.rdf
+cp $TMP $OUTDIR/${UUID}.ttl
 
 echo $UUID >> $OUTDIR/$IDS
 
 rm -f $TMP
 
-if [ ! -s $OUTDIR/${UUID}.mei ] ; then
-    echo  Creation of $OUTDIR/${UUID}.mei failed >> $OUTDIR/log.txt
+if [ ! -s $OUTDIR/${UUID}.ttl ] ; then
+    echo  Creation of MELD file $OUTDIR/${UUID}.ttl failed >> $OUTDIR/log.txt
     echo 'Status: 400 Bad Request'
     echo
     exit
 fi
 
-echo Created $OUTDIR/${UUID}.mei >> $OUTDIR/log.txt
+echo Created $OUTDIR/${UUID}.ttl >> $OUTDIR/log.txt
 
 # to return link
 
@@ -111,32 +113,24 @@ Access-Control-Allow-Origin: *
 <title>Numbers Into Notes - Link to MEI File</title>
 </head>
 <body>
-<h1>Link to MEI File</h1>
-<p><a href="$URLBASE/${UUID}.mei" download>${UUID}</A> generated on $DATE</p>
+<h1>Link to MELD File</h1>
+<p><a href="$URLBASE/${UUID}.ttl" download>${UUID}</A> generated on $DATE</p>
 </body>
 </html>
 EOF
 
-echo Generated $URLBASE/${UUID}.mei >> $OUTDIR/log.txt
+echo Generated $URLBASE/${UUID}.ttl >> $OUTDIR/log.txt
 
 exit 0
 
-# return MEI attachment for download
+# return MELD ,ttl attachment for download
 
 echo "Content-type: application/octet-stream"
-echo "Content-disposition: attachment; filename=$UUID.mei"
+echo "Content-disposition: attachment; filename=$UUID.ttl"
 echo "Access-Control-Allow-Origin: *"
 echo ""
-cat $OUTDIR/${UUID}.mei
+cat $OUTDIR/${UUID}.ttl
 
 exit 0
 
-# return audio/midi to be handled by browser
-
-echo "Content-type: image/audio/midi"
-echo ""
-cat $OUTDIR/${UUID}.mei
-
-exit 0
-
-# End of mei
+# End of meld

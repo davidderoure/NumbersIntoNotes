@@ -19,11 +19,17 @@
 #
 # David De Roure 15 February 2016
 
-# For ubuntu on demeter
-OUTDIR=/home/dder/www/NumbersIntoNotes/prov
-URLBASE="http://demeter.oerc.ox.ac.uk/NumbersIntoNotes/prov"
-CONVERT=/home/dder/ProvToolbox/bin/provconvert
+# For redhat on thalassa
+OUTDIR=/var/www/html/prov
+URLBASE="http://beta.numbersintonotes.net/prov"
+CONVERT=/usr/local/bin/provconvert
 PYTHON=/usr/bin/python2.7
+
+# For ubuntu on demeter
+#OUTDIR=/home/dder/www/NumbersIntoNotes/prov
+#URLBASE="http://demeter.oerc.ox.ac.uk/NumbersIntoNotes/prov"
+#CONVERT=/home/dder/ProvToolbox/bin/provconvert
+#PYTHON=/usr/bin/python2.7
 
 # For MacOS on Dave's laptop
 #OUTDIR=/Users/dave/Sites/prov
