@@ -1301,6 +1301,8 @@ function drawRoll() {
         }
     }
     document.getElementById("selected").innerHTML = selected ? selected : "";
+    // JPNP make t easier to create fragments with specific width
+    document.getElementById("selectwidth").innerHTML = selleft<selright ? selright - selleft : "";
 }
 
 function selectAll() {
@@ -2581,6 +2583,10 @@ function outputMeld() {
 
     var firstnote = notes[allnotes[allnotes.length - 1] % 12];
     var lastnote = notes[allnotes[0] % 12];
+    var highnote = allnotes.reduce(function(a,b) {
+            return Math.max( (a>127 ? -1 : a), (b>127 ? -1 : b))
+        });
+    var lownote = allnotes.reduce(function(a,b) { return Math.min(a,b) });
 
     // get key info identified by outputMei
 
@@ -2610,6 +2616,11 @@ function outputMeld() {
     output.push("  nin:key \"" + meldKey + "\" ;");
     output.push("  nin:mode \"" + meldMode + "\" ;");
     output.push("  nin:lastNote \"" + lastnote + "\" ;");
+    output.push("  nin:highNoteMidi \"" + highnote + "\" ;");
+    output.push("  nin:lowNoteMidi \"" + lownote + "\" ;");
+    output.push("  nin:highNote \"" + midiNoteName(highnote) + "\" ;");
+    output.push("  nin:lowNote \"" + midiNoteName(lownote) + "\" ;");
+    output.push("  nin:length \"" + (imax - imin) + "\" ;");
     output.push("  nin:tempo \"" + meldBpm + "\" .");
 
 //    output.push("{");

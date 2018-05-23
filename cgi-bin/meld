@@ -90,6 +90,8 @@ cp $TMP $OUTDIR/${UUID}.ttl
 
 echo $UUID >> $OUTDIR/$IDS
 
+echo $URLBASE/$UUID >> $OUTDIR/fragments.txt
+
 rm -f $TMP
 
 if [ ! -s $OUTDIR/${UUID}.ttl ] ; then
@@ -114,7 +116,7 @@ Access-Control-Allow-Origin: *
 </head>
 <body>
 <h1>Link to MELD File</h1>
-<p><a href="$URLBASE/${UUID}.ttl" download>${UUID}</A> generated on $DATE</p>
+<p><a href="$URLBASE/${UUID}" download>${UUID}</A> generated on $DATE</p>
 </body>
 </html>
 EOF
