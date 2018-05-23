@@ -2383,7 +2383,7 @@ function outputMei() {
     "  <body>",
     "   <mdiv>",
     "    <score>",
-    "     <scoreDef meter.count=\"4\" meter.unit=\"4\" key.sig=\"" + keysigs[keysig] + "\" key.mode=\"" + keymode + "\">",   
+    "     <scoreDef midi.bpm=\"150\" meter.count=\"4\" meter.unit=\"4\" key.sig=\"" + keysigs[keysig] + "\" key.mode=\"" + keymode + "\">",   
     "      <staffGrp>",
     "       <staffDef n=\"1\" " + displacement + "clef.line=\"2\" clef.shape=\"G\" lines=\"5\"/>",
     "      </staffGrp>",
