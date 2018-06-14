@@ -1,0 +1,83 @@
+
+# For Ubuntu 16.04 Docker container
+PYTHON=/usr/bin/python2.7
+CSVMIDI=/usr/bin/csvmidi
+CONVERT=/usr/local/bin/provconvert
+LILYPOND=/usr/bin/lilypond
+OUTPREFIX=/data
+URLPREFIX="http://pybus.oerc.ox.ac.uk:8080"
+
+# For redhat on thalassa
+#PYTHON=/usr/bin/python2.7
+#CSVMIDI=/usr/local/bin/csvmidi
+#CONVERT=/usr/local/bin/provconvert
+#LILYPOND=/usr/local/lilypond/usr/bin/lilypond
+#OUTPREFIX=/var/www/html
+#URLPREFIX="http://beta.numbersintonotes.net"
+
+# For ubuntu on demeter
+#OUTDIR=/home/dder/www/NumbersIntoNotes/midi
+#URLBASE="http://demeter.oerc.ox.ac.uk/NumbersIntoNotes/midi"
+#CSVMIDI=/usr/local/bin/csvmidi
+#PYTHON=/usr/bin/python2.7
+
+# For MacOS on Dave's laptop
+#OUTDIR=/Users/dave/Sites/midi
+#URLBASE="http://localhost/~dave/midi"
+#CSVMIDI=/Users/dave/bin/csvmidi
+#PYTHON=/Library/Frameworks/Python.framework/Versions/2.7/bin/python2.7
+
+# For ubuntu on demeter
+#OUTDIR=/home/dder/www/NumbersIntoNotes/midi
+#URLBASE="http://demeter.oerc.ox.ac.uk/NumbersIntoNotes/midi"
+#CSVMIDI=/usr/local/bin/csvmidi
+#PYTHON=/usr/bin/python2.7
+
+# For MacOS on Dave's laptop
+#OUTDIR=/Users/dave/Sites/pdf
+#URLBASE="http://localhost/~dave/pdf"
+#LILYPOND=/Applications/LilyPond.app/Contents/Resources/bin/lilypond
+#PYTHON=/Library/Frameworks/Python.framework/Versions/2.7/bin/python2.7
+
+# For ubuntu on demeter
+#OUTDIR=/home/dder/www/NumbersIntoNotes/mei
+#URLBASE="http://numbersintonotes.net/mei"
+#PYTHON=/usr/bin/python2.7
+
+# For MacOS on Dave's laptop
+#OUTDIR=/Users/dave/Sites/midi
+#URLBASE="http://localhost/~dave/midi"
+#PYTHON=/Library/Frameworks/Python.framework/Versions/2.7/bin/python2.7
+
+# For ubuntu on demeter
+#OUTDIR=/home/dder/www/NumbersIntoNotes/mei
+#URLBASE="http://numbersintonotes.net/mei"
+#PYTHON=/usr/bin/python2.7
+
+# For MacOS on Dave's laptop
+#OUTDIR=/Users/dave/Sites/midi
+#URLBASE="http://localhost/~dave/midi"
+#PYTHON=/Library/Frameworks/Python.framework/Versions/2.7/bin/python2.7
+
+# For ubuntu on demeter
+#OUTDIR=/home/dder/www/NumbersIntoNotes/mei
+#URLBASE="http://numbersintonotes.net/mei"
+#PYTHON=/usr/bin/python2.7
+
+# For MacOS on Dave's laptop
+#OUTDIR=/Users/dave/Sites/midi
+#URLBASE="http://localhost/~dave/midi"
+#PYTHON=/Library/Frameworks/Python.framework/Versions/2.7/bin/python2.7
+
+# For ubuntu on demeter
+#OUTDIR=/home/dder/www/NumbersIntoNotes/prov
+#URLBASE="http://demeter.oerc.ox.ac.uk/NumbersIntoNotes/prov"
+#CONVERT=/home/dder/ProvToolbox/bin/provconvert
+#PYTHON=/usr/bin/python2.7
+
+# For MacOS on Dave's laptop
+#OUTDIR=/Users/dave/Sites/prov
+#URLBASE="http://localhost/~dave/prov"
+#CONVERT=/Users/dave/bin/prov
+#PYTHON=/Library/Frameworks/Python.framework/Versions/2.7/bin/python2.7
+

@@ -16,10 +16,15 @@
 #
 # David De Roure 1 January 2018.
 
+source ./config
+
+OUTDIR=$OUTPREFIX/meld
+URLBASE="$URLPREFIX/meld"
+
 # For redhat on thalassa
-OUTDIR=/var/www/html/meld
-URLBASE="http://beta.numbersintonotes.net/meld"
-PYTHON=/usr/bin/python2.7
+#OUTDIR=/var/www/html/meld
+#URLBASE="http://beta.numbersintonotes.net/meld"
+#PYTHON=/usr/bin/python2.7
 
 # For ubuntu on demeter
 #OUTDIR=/home/dder/www/NumbersIntoNotes/mei

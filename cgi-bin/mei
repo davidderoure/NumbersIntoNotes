@@ -16,10 +16,15 @@
 #
 # David De Roure 12 December 2017.
 
+source ./config
+
+OUTDIR=$OUTPREFIX/mei
+URLBASE="$URLPREFIX/mei"
+
 # For redhat on thalassa
-OUTDIR=/var/www/html/mei
-URLBASE="http://beta.numbersintonotes.net/mei"
-PYTHON=/usr/bin/python2.7
+#OUTDIR=/var/www/html/mei
+#URLBASE="http://beta.numbersintonotes.net/mei"
+#PYTHON=/usr/bin/python2.7
 
 # For ubuntu on demeter
 #OUTDIR=/home/dder/www/NumbersIntoNotes/mei

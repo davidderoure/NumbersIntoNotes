@@ -19,11 +19,16 @@
 #
 # David De Roure 31 January 2015
 
+source ./config
+
+OUTDIR=$OUTPREFIX/pdf
+URLBASE="$URLPREFIX/pdf"
+
 # For redhat on thalassa
-OUTDIR=/var/www/html/pdf
-URLBASE="http://beta.numbersintonotes.net/pdf"
-LILYPOND=/usr/local/lilypond/usr/bin/lilypond
-PYTHON=/usr/bin/python2.7
+#OUTDIR=/var/www/html/pdf
+#URLBASE="http://beta.numbersintonotes.net/pdf"
+#LILYPOND=/usr/local/lilypond/usr/bin/lilypond
+#PYTHON=/usr/bin/python2.7
 
 # For ubuntu on demeter
 #OUTDIR=/home/dder/www/NumbersIntoNotes/midi

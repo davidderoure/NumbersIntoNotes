@@ -19,11 +19,16 @@
 #
 # David De Roure 31 December 2015, updated 6 February 2016
 
+source ./config
+
+OUTDIR=$OUTPREFIX/midi
+URLBASE="$URLPREFIX/midi"
+
 # For redhat on thalassa
-OUTDIR=/var/www/html/midi
-URLBASE="http://beta.numbersintonotes.net/midi"
-CSVMIDI=/usr/local/bin/csvmidi
-PYTHON=/usr/bin/python2.7
+#OUTDIR=/var/www/html/midi
+#URLBASE="http://beta.numbersintonotes.net/midi"
+#CSVMIDI=/usr/local/bin/csvmidi
+#PYTHON=/usr/bin/python2.7
 
 # For ubuntu on demeter
 #OUTDIR=/home/dder/www/NumbersIntoNotes/midi

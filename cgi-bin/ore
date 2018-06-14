@@ -16,10 +16,15 @@
 #
 # David De Roure 1 January 2018.
 
+source ./config
+
+OUTDIR=$OUTPREFIX/ore
+URLBASE="$URLPREFIX/ore"
+
 # For redhat on thalassa
-OUTDIR=/var/www/html/ore
-URLBASE="http://beta.numbersintonotes.net/ore"
-PYTHON=/usr/bin/python2.7
+#OUTDIR=/var/www/html/ore
+#URLBASE="http://beta.numbersintonotes.net/ore"
+#PYTHON=/usr/bin/python2.7
 
 # For ubuntu on demeter
 #OUTDIR=/home/dder/www/NumbersIntoNotes/mei
