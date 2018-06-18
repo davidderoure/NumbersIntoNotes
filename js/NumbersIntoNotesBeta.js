@@ -2609,7 +2609,7 @@ function outputMeld() {
     output.push("@prefix nin: <http://numbersintonotes.net/terms#> .");
     output.push("");
     output.push("<> a mo:Score ;");
-    output.push("  mo:published_as <http://beta.numbersintonotes.net/mei/" + meldId + ".mei> ;");
+    output.push("  mo:published_as <" + ninuribase + "mei/" + meldId + ".mei> ;");
     output.push("  dc:creator \"" + meldCreator + "\" ;");
     output.push("  dc:title \"" + meldTitle + "\" ;");
     output.push("  nin:firstNote \"" + firstnote + "\" ;");
