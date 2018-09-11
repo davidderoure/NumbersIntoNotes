@@ -2507,6 +2507,7 @@ function outputMei() {
               output.push("<note pname=\"" + pnam[pitch][ par[n] % 12 ] + 
                        "\" " + a + "oct=\"" + 
                        (Math.floor(par[n] / 12) - 2).toString() + 
+                       "\" pnum=\"" + par[n].toString() +
                        "\" xml:id=\"n" + i + "\" dur=\"4\"/>");
           }
         }
