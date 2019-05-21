@@ -5,7 +5,7 @@ CSVMIDI=/usr/bin/csvmidi
 CONVERT=/usr/local/bin/provconvert
 LILYPOND=/usr/bin/lilypond
 OUTPREFIX=/data
-URLPREFIX="http://pybus.oerc.ox.ac.uk:8080"
+URLPREFIX="http://thalassa2.oerc.ox.ac.uk:8080"
 
 # For redhat on thalassa
 #PYTHON=/usr/bin/python2.7
